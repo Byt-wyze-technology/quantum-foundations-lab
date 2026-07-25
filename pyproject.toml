@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quantum-foundations"
+version = "0.1.0"
+description = "An interactive field guide to the mathematics that makes quantum computing possible."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Quantum Foundations Lab contributors" }]
+dependencies = [
+  "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "hypothesis", "httpx", "mypy", "ruff"]
+web = ["fastapi>=0.110", "uvicorn[standard]>=0.29", "pydantic>=2.6"]
+streamlit = ["streamlit", "matplotlib"]
+
+[tool.setuptools]
+packages = ["quantum_foundations", "quantum_foundations.core", "quantum_foundations.lessons"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["error"]
+
+[tool.mypy]
+python_version = "3.11"
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_return_any = true
+files = ["quantum_foundations"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

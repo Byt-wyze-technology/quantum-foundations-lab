@@ -20,6 +20,25 @@ Like QuasiShor:
 
 ---
 
+---
+
+# Implementation progress
+
+Status markers are updated as each part is implemented. Lesson sections map to
+Phases 3–5 of §20 in the Technical Implementation Specification, which is the
+companion source of truth for how each one is built.
+
+| Marker | Meaning |
+| --- | --- |
+| ✅ COMPLETE | Implemented, tested, and meeting its stated criteria |
+| 🟡 PARTIAL | Some deliverables landed; the remainder is named in the section |
+| ⬜ NOT STARTED | No implementation yet |
+
+Current state: the mathematical core behind every lesson below is complete and
+tested (Phase 1). No lesson UI is built yet.
+
+---
+
 # Design philosophy
 
 Exactly the same philosophy as QuasiShor.
@@ -52,7 +71,7 @@ Every section answers one question.
 
 ---
 
-# Lesson 0 — Classical bits
+# Lesson 0 — Classical bits — ⬜ NOT STARTED
 
 Purpose:
 
@@ -82,7 +101,7 @@ Then ask:
 
 ---
 
-# Lesson 1 — The Bloch sphere
+# Lesson 1 — The Bloch sphere — ⬜ NOT STARTED
 
 Hero visual.
 
@@ -139,7 +158,7 @@ appearing around the sphere.
 
 ---
 
-# Lesson 2 — Spins and polarisation
+# Lesson 2 — Spins and polarisation — ⬜ NOT STARTED
 
 Don't start with electrons.
 
@@ -179,7 +198,7 @@ Measurement axis.
 
 ---
 
-# Lesson 3 — State vectors
+# Lesson 3 — State vectors — ⬜ NOT STARTED
 
 Now introduce
 
@@ -215,7 +234,7 @@ complex phase.
 
 ---
 
-# Lesson 4 — Phase
+# Lesson 4 — Phase — ⬜ NOT STARTED
 
 This is where most students struggle.
 
@@ -243,7 +262,7 @@ complex amplitudes.
 
 ---
 
-# Lesson 5 — Pauli matrices
+# Lesson 5 — Pauli matrices — ⬜ NOT STARTED
 
 Instead of
 
@@ -295,7 +314,7 @@ with every animation linked to matrix multiplication.
 
 ---
 
-# Lesson 6 — Unitary operations
+# Lesson 6 — Unitary operations — ⬜ NOT STARTED
 
 Visual:
 
@@ -327,7 +346,7 @@ Returns exactly.
 
 ---
 
-# Lesson 7 — Two qubits
+# Lesson 7 — Two qubits — ⬜ NOT STARTED
 
 Big leap.
 
@@ -367,7 +386,7 @@ Sliders.
 
 ---
 
-# Lesson 8 — Tensor products
+# Lesson 8 — Tensor products — ⬜ NOT STARTED
 
 Avoid writing ⊗ first.
 
@@ -405,7 +424,7 @@ Matrix appears afterwards.
 
 ---
 
-# Lesson 9 — Measurement
+# Lesson 9 — Measurement — ⬜ NOT STARTED
 
 Huge animation.
 
@@ -437,7 +456,7 @@ Expectation values.
 
 ---
 
-# Lesson 10 — Hermitian operators
+# Lesson 10 — Hermitian operators — ⬜ NOT STARTED
 
 Visual:
 
@@ -473,7 +492,7 @@ measured values.
 
 ---
 
-# Lesson 11 — Entanglement
+# Lesson 11 — Entanglement — ⬜ NOT STARTED
 
 Most important section.
 
@@ -509,7 +528,7 @@ Only correlations.
 
 ---
 
-# Lesson 12 — Bell states
+# Lesson 12 — Bell states — ⬜ NOT STARTED
 
 Build them.
 
@@ -539,7 +558,7 @@ Interactive.
 
 ---
 
-# Lesson 13 — EPR experiment
+# Lesson 13 — EPR experiment — ⬜ NOT STARTED
 
 Visual experiment.
 
@@ -561,7 +580,7 @@ End with them.
 
 ---
 
-# Explore Laboratory
+# Explore Laboratory — ⬜ NOT STARTED
 
 Exactly like QuasiShor.
 
@@ -587,7 +606,7 @@ Every interaction updates all views simultaneously.
 
 ---
 
-# Teaching principles
+# Teaching principles — ⬜ NOT STARTED
 
 Every lesson follows the same pattern:
 
@@ -601,7 +620,7 @@ Every lesson follows the same pattern:
 
 ---
 
-# Technical architecture
+# Technical architecture — 🟡 PARTIAL — shared Python core complete; React/TypeScript frontend and FastAPI backend pending
 
 Reuse the QuasiShor architecture where practical:
 
@@ -612,7 +631,7 @@ Reuse the QuasiShor architecture where practical:
 
 ---
 
-# Success criteria
+# Success criteria — ⬜ NOT STARTED
 
 A learner who completes the guided lesson should be able to:
 

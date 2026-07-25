@@ -1,11 +1,37 @@
 # Quantum Foundations Lab — Full Technical Implementation Specification
 
-**Status:** Implementation-ready
+**Status:** In implementation
 **Product family:** QuasiShor educational apps
 **Primary experience:** Guided lesson + interactive laboratory
 **Target platforms:** Modern desktop and tablet browsers
 **Initial scope:** One- and two-qubit systems
 **Explicit non-goal:** General-purpose quantum simulation
+
+---
+
+## Implementation progress
+
+This document is the source of truth. Section headings carry a status marker,
+updated as each section actually lands and its tests pass. Nothing outside this
+document gets built; anything that proves necessary is added here as future
+work first.
+
+| Marker | Meaning |
+| --- | --- |
+| ✅ COMPLETE | Implemented, tested, and meeting the section's stated criteria |
+| 🟡 PARTIAL | Some deliverables landed; the remainder is named in the section |
+| ⬜ NOT STARTED | No implementation yet |
+
+### Phase status (§20)
+
+| Phase | Status | Exit criterion |
+| --- | --- | --- |
+| 1 — Mathematical core | ✅ COMPLETE | All mathematical invariants pass — 229 tests, ruff and mypy clean |
+| 2 — One-qubit Explore lab | ⬜ NOT STARTED | Construct, rotate and measure arbitrary pure one-qubit states |
+| 3 — Guided one-qubit lesson | ⬜ NOT STARTED | Every section has visual, experiment, mathematics and checkpoint |
+| 4 — Two-qubit system | ⬜ NOT STARTED | Students can distinguish product and entangled states |
+| 5 — EPR and Bell correlations | ⬜ NOT STARTED | Ideal correlations shown without implying communication |
+| 6 — Open-source release | ⬜ NOT STARTED | Docs, CI, figures and release package |
 
 ---
 
@@ -48,7 +74,12 @@ The application must not imply that:
 
 ---
 
-# 2. Repository architecture
+# 2. Repository architecture — 🟡 PARTIAL
+
+*Monorepo layout, `pyproject.toml`, `.gitignore` and the `quantum_foundations`
+package are in place. `apps/web/frontend`, `apps/web/backend`,
+`apps/streamlit`, `scripts/`, `images/` and `docs/` exist as directories and
+are populated in Phases 2–6.*
 
 Recommended monorepo layout:
 
@@ -109,7 +140,7 @@ The frontend may reproduce the same mathematics in TypeScript for immediate inte
 
 ---
 
-# 3. Technology stack
+# 3. Technology stack — 🟡 PARTIAL
 
 ## Frontend
 
@@ -147,7 +178,11 @@ Recommended split:
 
 ---
 
-# 4. Mathematical type system
+# 4. Mathematical type system — ✅ COMPLETE
+
+*Implemented in `quantum_foundations/core/types.py`. Density matrices are in
+the architecture as specified, via `density_matrix`, `partial_trace` and
+`purity` in `entanglement.py`.*
 
 All core mathematical objects must have explicit domains.
 
@@ -264,9 +299,28 @@ This becomes important for:
 
 ---
 
-# 5. Core Python API
+# 5. Core Python API — ✅ COMPLETE
 
-## 5.1 `types.py`
+*Every function listed in §5.1–§5.7 is implemented with the specified
+signature. The following helpers were added because other sections of this
+document require them; they are recorded here so the document stays the source
+of truth:*
+
+* *`states.ket_plus_i` / `ket_minus_i` — the |+i⟩ and |−i⟩ buttons required by §8.1.*
+* *`states.bloch_vector` — the `selectBlochVector` selector required by §6. Rejects
+  multi-qubit input, so the §21 rule that the Bloch sphere is used only for
+  one-qubit pure states is enforced in the core rather than in the UI.*
+* *`observables.axis_from_angles` — converts the `{theta, phi}` measurement axis
+  of §6 into the Cartesian unit vector `spin_observable` takes.*
+* *`gates.NAMED_GATES`, `PARAMETRIC_GATES`, `gate_matrix`, `gate_qubit_count` —
+  gate-name resolution for the `{"name": "H", "targets": [0]}` payload of §11
+  and the gate palette of §9.*
+* *`entanglement.BELL_STATES` — the named-preset registry used by §9 and the
+  `"state": "psi_minus"` field of §11.*
+* *`entanglement.schmidt_coefficients` — lets §8.9 show how far a state is from
+  being a product state, not merely whether it is one.*
+
+## 5.1 `types.py` — ✅ COMPLETE
 
 ```python
 from typing import TypeAlias
@@ -298,7 +352,7 @@ class MeasurementOutcome:
 
 ---
 
-## 5.2 `states.py`
+## 5.2 `states.py` — ✅ COMPLETE
 
 Required functions:
 
@@ -348,7 +402,7 @@ e^{i\gamma}|\psi\rangle
 
 ---
 
-## 5.3 `gates.py`
+## 5.3 `gates.py` — ✅ COMPLETE
 
 Constants:
 
@@ -430,7 +484,7 @@ def is_unitary(matrix: ComplexMatrix, *, atol: float = 1e-10) -> bool: ...
 
 ---
 
-## 5.4 `tensor.py`
+## 5.4 `tensor.py` — ✅ COMPLETE
 
 ```python
 def tensor_product(*objects: ComplexVector | ComplexMatrix) -> ComplexVector | ComplexMatrix:
@@ -474,7 +528,7 @@ Recommended convention:
 
 ---
 
-## 5.5 `measurement.py`
+## 5.5 `measurement.py` — ✅ COMPLETE
 
 Projective measurement in the computational basis:
 
@@ -539,7 +593,7 @@ It must not animate one physical qubit as if it can be measured repeatedly witho
 
 ---
 
-## 5.6 `observables.py`
+## 5.6 `observables.py` — ✅ COMPLETE
 
 ```python
 def is_hermitian(matrix: ComplexMatrix, *, atol: float = 1e-10) -> bool: ...
@@ -608,7 +662,7 @@ where:
 
 ---
 
-## 5.7 `entanglement.py`
+## 5.7 `entanglement.py` — ✅ COMPLETE
 
 Bell states:
 
@@ -700,7 +754,7 @@ This provides a rigorous visual explanation of why neither entangled subsystem h
 
 ---
 
-# 6. Frontend state model
+# 6. Frontend state model — ⬜ NOT STARTED
 
 Recommended Zustand store:
 
@@ -772,7 +826,7 @@ selectExpectationValues()
 
 ---
 
-# 7. Guided lesson implementation
+# 7. Guided lesson implementation — ⬜ NOT STARTED
 
 The guided lesson should be implemented as data-driven sections rather than one monolithic component.
 
@@ -816,7 +870,7 @@ Each section should support:
 
 ---
 
-# 8. Detailed lesson modules
+# 8. Detailed lesson modules — ⬜ NOT STARTED
 
 ## 8.1 Classical bit versus qubit
 
@@ -1267,7 +1321,7 @@ The simulation must label this as an ideal theoretical model.
 
 ---
 
-# 9. Explore laboratory
+# 9. Explore laboratory — ⬜ NOT STARTED
 
 ## Main controls
 
@@ -1322,7 +1376,7 @@ Partially entangled state
 
 ---
 
-# 10. Visual components
+# 10. Visual components — ⬜ NOT STARTED
 
 ## `BlochSphere`
 
@@ -1410,7 +1464,7 @@ Advanced panel:
 
 ---
 
-# 11. API design
+# 11. API design — ⬜ NOT STARTED
 
 The app can run locally in the browser, but a backend provides reproducibility, validation and export.
 
@@ -1509,7 +1563,7 @@ Request:
 
 ---
 
-# 12. Data serialization
+# 12. Data serialization — ⬜ NOT STARTED
 
 Complex numbers:
 
@@ -1543,7 +1597,7 @@ Quantum state:
 
 ---
 
-# 13. Validation rules
+# 13. Validation rules — ✅ COMPLETE
 
 Reject:
 
@@ -1573,7 +1627,7 @@ Error example:
 
 ---
 
-# 14. Numerical tolerances
+# 14. Numerical tolerances — ✅ COMPLETE
 
 Recommended defaults:
 
@@ -1595,9 +1649,9 @@ This must not conceal materially invalid states.
 
 ---
 
-# 15. Test plan
+# 15. Test plan — 🟡 PARTIAL
 
-## Core unit tests
+## Core unit tests — ✅ COMPLETE
 
 ### State normalisation
 
@@ -1701,7 +1755,7 @@ def test_z_expectation_for_zero_state():
 
 ---
 
-## Property-based tests
+## Property-based tests — ✅ COMPLETE
 
 Use Hypothesis to generate:
 
@@ -1734,7 +1788,7 @@ Properties:
 
 ---
 
-## Frontend tests
+## Frontend tests — ⬜ NOT STARTED
 
 Verify:
 
@@ -1751,7 +1805,7 @@ Verify:
 
 ---
 
-## End-to-end tests
+## End-to-end tests — ⬜ NOT STARTED
 
 ### Bell-state lesson
 
@@ -1773,7 +1827,7 @@ Verify:
 
 ---
 
-# 16. Accessibility
+# 16. Accessibility — ⬜ NOT STARTED
 
 Required:
 
@@ -1798,7 +1852,7 @@ Measurement probabilities in the Z basis:
 
 ---
 
-# 17. Performance limits
+# 17. Performance limits — 🟡 PARTIAL
 
 Version 1 supports:
 
@@ -1814,7 +1868,7 @@ Do not initially support arbitrary (n)-qubit state vectors. The educational valu
 
 ---
 
-# 18. Analytics
+# 18. Analytics — ⬜ NOT STARTED
 
 Track only educational interaction events:
 
@@ -1840,7 +1894,7 @@ Useful learning metrics:
 
 ---
 
-# 19. Security and privacy
+# 19. Security and privacy — 🟡 PARTIAL
 
 * no account required for initial release;
 * no personally identifiable information required;
@@ -1856,7 +1910,7 @@ Useful learning metrics:
 
 # 20. Delivery phases
 
-## Phase 1 — Mathematical core
+## Phase 1 — Mathematical core — ✅ COMPLETE
 
 Deliver:
 
@@ -1876,7 +1930,7 @@ Exit criterion:
 
 All mathematical invariants pass.
 
-## Phase 2 — One-qubit Explore lab
+## Phase 2 — One-qubit Explore lab — ⬜ NOT STARTED
 
 Deliver:
 
@@ -1892,7 +1946,7 @@ Exit criterion:
 
 A learner can construct, rotate and measure arbitrary pure one-qubit states.
 
-## Phase 3 — Guided one-qubit lesson
+## Phase 3 — Guided one-qubit lesson — ⬜ NOT STARTED
 
 Deliver:
 
@@ -1910,7 +1964,7 @@ Exit criterion:
 
 All sections include visual, experiment, mathematics and checkpoint.
 
-## Phase 4 — Two-qubit system
+## Phase 4 — Two-qubit system — ⬜ NOT STARTED
 
 Deliver:
 
@@ -1925,7 +1979,7 @@ Exit criterion:
 
 Students can distinguish product and entangled states.
 
-## Phase 5 — EPR and Bell correlations
+## Phase 5 — EPR and Bell correlations — ⬜ NOT STARTED
 
 Deliver:
 
@@ -1939,7 +1993,7 @@ Exit criterion:
 
 The app accurately displays ideal quantum correlations without implying communication.
 
-## Phase 6 — Open-source release
+## Phase 6 — Open-source release — ⬜ NOT STARTED
 
 Deliver:
 
@@ -1957,7 +2011,7 @@ Deliver:
 
 ---
 
-# 21. Completion criteria
+# 21. Completion criteria — 🟡 PARTIAL
 
 The project is ready when:
 
