@@ -34,8 +34,9 @@ companion source of truth for how each one is built.
 | 🟡 PARTIAL | Some deliverables landed; the remainder is named in the section |
 | ⬜ NOT STARTED | No implementation yet |
 
-Current state: the mathematical core behind every lesson below is complete and
-tested (Phase 1). No lesson UI is built yet.
+Current state: the mathematical core is complete and tested (Phase 1), and the
+Explore laboratory is complete for one qubit (Phase 2). The guided lesson
+sections below are next, in Phase 3.
 
 ---
 
@@ -580,7 +581,7 @@ End with them.
 
 ---
 
-# Explore Laboratory — ⬜ NOT STARTED
+# Explore Laboratory — 🟡 PARTIAL — one-qubit mode complete; two qubits in Phase 4
 
 Exactly like QuasiShor.
 
@@ -620,7 +621,7 @@ Every lesson follows the same pattern:
 
 ---
 
-# Technical architecture — 🟡 PARTIAL — shared Python core complete; React/TypeScript frontend and FastAPI backend pending
+# Technical architecture — 🟡 PARTIAL — shared Python core and React/TypeScript frontend complete; FastAPI backend pending
 
 Reuse the QuasiShor architecture where practical:
 

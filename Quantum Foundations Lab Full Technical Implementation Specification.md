@@ -27,7 +27,7 @@ work first.
 | Phase | Status | Exit criterion |
 | --- | --- | --- |
 | 1 — Mathematical core | ✅ COMPLETE | All mathematical invariants pass — 229 tests, ruff and mypy clean |
-| 2 — One-qubit Explore lab | ⬜ NOT STARTED | Construct, rotate and measure arbitrary pure one-qubit states |
+| 2 — One-qubit Explore lab | ✅ COMPLETE | Met — presets, drag and keyboard construct any pure state; gates and rotations turn it; any measurement axis and shot count measure it. 75 frontend tests |
 | 3 — Guided one-qubit lesson | ⬜ NOT STARTED | Every section has visual, experiment, mathematics and checkpoint |
 | 4 — Two-qubit system | ⬜ NOT STARTED | Students can distinguish product and entangled states |
 | 5 — EPR and Bell correlations | ⬜ NOT STARTED | Ideal correlations shown without implying communication |
@@ -141,6 +141,12 @@ The frontend may reproduce the same mathematics in TypeScript for immediate inte
 ---
 
 # 3. Technology stack — 🟡 PARTIAL
+
+*Frontend stack in place: React 18, TypeScript, Vite 6, Zustand, React Router,
+SVG for diagrams, Canvas for the Bloch sphere, KaTeX, Vitest and React Testing
+Library. Playwright is installed; its end-to-end specs are written in Phase 6
+when the flows they cover exist. D3 has not been needed. Backend stack
+(FastAPI, Pydantic v2) is Phase 6.*
 
 ## Frontend
 
@@ -754,7 +760,13 @@ This provides a rigorous visual explanation of why neither entangled subsystem h
 
 ---
 
-# 6. Frontend state model — ⬜ NOT STARTED
+# 6. Frontend state model — 🟡 PARTIAL
+
+*Implemented in `apps/web/frontend/src/store/labStore.ts` with every field and
+action listed below. `currentState` is derived by replaying the circuit from
+`initialState`, so the displayed state can never disagree with the displayed
+circuit. `selectReducedBlochVectors`, `selectStatePurity` and
+`selectEntanglementMeasure` require two-qubit mode and arrive in Phase 4.*
 
 Recommended Zustand store:
 
@@ -1321,7 +1333,11 @@ The simulation must label this as an ideal theoretical model.
 
 ---
 
-# 9. Explore laboratory — ⬜ NOT STARTED
+# 9. Explore laboratory — 🟡 PARTIAL
+
+*One-qubit mode complete: all six panels, the gate palette, rotation gates,
+measurement basis and arbitrary axis, shot batches, undo, reset, seed and
+share-state link. Two-qubit mode and its presets arrive in Phase 4.*
 
 ## Main controls
 
@@ -1376,7 +1392,12 @@ Partially entangled state
 
 ---
 
-# 10. Visual components — ⬜ NOT STARTED
+# 10. Visual components — 🟡 PARTIAL
+
+*`BlochSphere`, `AmplitudePhasor`, `AmplitudeBars`, `StateEquation` and
+`MeasurementHistogram` are implemented. `CircuitBuilder` currently ships as a
+linear `CircuitHistory`; its drag-and-drop form belongs with two-qubit mode in
+Phase 4, and `DensityMatrixHeatmap` with the reduced states there too.*
 
 ## `BlochSphere`
 
@@ -1788,7 +1809,10 @@ Properties:
 
 ---
 
-## Frontend tests — ⬜ NOT STARTED
+## Frontend tests — 🟡 PARTIAL
+
+*The one-qubit cases below all pass, along with the two copy guards. The
+two-qubit and Bell-state cases arrive with Phase 4.*
 
 Verify:
 
@@ -1827,7 +1851,13 @@ Verify:
 
 ---
 
-# 16. Accessibility — ⬜ NOT STARTED
+# 16. Accessibility — 🟡 PARTIAL
+
+*Implemented for everything built so far: keyboard control of the Bloch sphere
+and every slider, screen-reader descriptions of state changes, text
+equivalents for each visual, high-contrast and reduced-motion modes, phase
+carried by figures as well as colour, visible focus rings, 44×44 px targets and
+a skip link. A full audit runs in Phase 6, once every surface exists.*
 
 Required:
 
@@ -1896,6 +1926,11 @@ Useful learning metrics:
 
 # 19. Security and privacy — 🟡 PARTIAL
 
+*No account, no personal data, and share links encode only the prepared
+state's angles, the gate sequence and the measurement axis. Deterministic
+seeds are supported for classroom demonstrations. Server-side validation,
+request-size limits and CORS configuration arrive with the backend in Phase 6.*
+
 * no account required for initial release;
 * no personally identifiable information required;
 * state-sharing links encode only circuit and state parameters;
@@ -1930,7 +1965,7 @@ Exit criterion:
 
 All mathematical invariants pass.
 
-## Phase 2 — One-qubit Explore lab — ⬜ NOT STARTED
+## Phase 2 — One-qubit Explore lab — ✅ COMPLETE
 
 Deliver:
 
