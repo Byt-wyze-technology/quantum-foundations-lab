@@ -1,0 +1,629 @@
+
+---
+
+# PRD — Quantum Foundations Lab
+
+**Working title:**
+**Quantum Foundations Lab**
+
+**Tagline**
+
+> *An interactive field guide to the mathematics that makes quantum computing possible.*
+
+Like QuasiShor:
+
+* beautiful typography
+* one scrollable guided lesson
+* an Explore laboratory
+* every idea interactive
+* mathematics appears only after intuition
+
+---
+
+# Design philosophy
+
+Exactly the same philosophy as QuasiShor.
+
+Not:
+
+> Here is a matrix.
+
+Instead:
+
+> Here is a picture.
+
+↓
+
+Manipulate it.
+
+↓
+
+Notice a pattern.
+
+↓
+
+Explain the mathematics.
+
+↓
+
+Show the matrix.
+
+Every section answers one question.
+
+---
+
+# Lesson 0 — Classical bits
+
+Purpose:
+
+Establish what makes a qubit different.
+
+Visual:
+
+```
+0 ----------------- 1
+
+switch
+```
+
+Student toggles
+
+```
+0
+
+1
+```
+
+Nothing in between.
+
+Then ask:
+
+"What if a state could point anywhere?"
+
+---
+
+# Lesson 1 — The Bloch sphere
+
+Hero visual.
+
+A large interactive sphere.
+
+Dragging rotates an arrow.
+
+The arrow is the qubit.
+
+No amplitudes initially.
+
+Only intuition.
+
+The page asks:
+
+> A classical bit has two positions.
+
+> A qubit has infinitely many directions.
+
+Only later explain
+
+[
+|\psi\rangle
+============
+
+\alpha|0\rangle+\beta|1\rangle
+]
+
+Then animate
+
+North pole
+
+↓
+
+South pole
+
+↓
+
+Equator
+
+Show
+
+```
+|0>
+
+|1>
+
+|+>
+
+|->
+```
+
+appearing around the sphere.
+
+---
+
+# Lesson 2 — Spins and polarisation
+
+Don't start with electrons.
+
+Start with sunglasses.
+
+Visual:
+
+Rotate a polarising filter.
+
+Incoming light.
+
+Brightness changes.
+
+Student rotates:
+
+```
+0°
+
+30°
+
+45°
+
+90°
+```
+
+Then reveal
+
+Polarisation states behave mathematically like qubits.
+
+Second example:
+
+Compass needle.
+
+Spin.
+
+Measurement axis.
+
+---
+
+# Lesson 3 — State vectors
+
+Now introduce
+
+```
+|0>
+
+|1>
+```
+
+Show them as basis vectors.
+
+Large geometric animation.
+
+Every qubit
+
+↓
+
+weighted combination
+
+↓
+
+arrow moves.
+
+Sliders:
+
+Real α
+
+Real β
+
+Later
+
+complex phase.
+
+---
+
+# Lesson 4 — Phase
+
+This is where most students struggle.
+
+Don't use matrices.
+
+Use clocks.
+
+Every amplitude is a clock hand.
+
+Animation:
+
+Two arrows.
+
+Rotate one.
+
+Add them.
+
+Constructive interference.
+
+Destructive interference.
+
+Only then explain
+
+complex amplitudes.
+
+---
+
+# Lesson 5 — Pauli matrices
+
+Instead of
+
+```
+σx =
+```
+
+Start with
+
+"What transformations can we perform?"
+
+Interactive cube:
+
+Click
+
+X
+
+Arrow flips.
+
+Click
+
+Z
+
+Arrow rotates.
+
+Click
+
+Y
+
+Arrow rotates differently.
+
+Animation first.
+
+Matrix second.
+
+Only after intuition:
+
+Display
+
+[
+X=
+\begin{pmatrix}
+0&1\
+1&0
+\end{pmatrix}
+]
+
+with every animation linked to matrix multiplication.
+
+---
+
+# Lesson 6 — Unitary operations
+
+Visual:
+
+Rubik's Cube analogy.
+
+Moves can always be undone.
+
+Then
+
+Arrow rotates.
+
+Undo button.
+
+Everything reversible.
+
+Only then explain
+
+[
+U^\dagger U=I
+]
+
+Interactive check:
+
+Student drags rotation.
+
+Press undo.
+
+Returns exactly.
+
+---
+
+# Lesson 7 — Two qubits
+
+Big leap.
+
+Visual:
+
+One Bloch sphere.
+
+↓
+
+Two Bloch spheres.
+
+Then explain
+
+They no longer live on two spheres.
+
+Instead
+
+A four-dimensional state.
+
+Visual:
+
+State table
+
+```
+00
+
+01
+
+10
+
+11
+```
+
+Amplitude bars.
+
+Sliders.
+
+---
+
+# Lesson 8 — Tensor products
+
+Avoid writing ⊗ first.
+
+Use Lego.
+
+One block
+
+×
+
+another block
+
+↓
+
+larger structure.
+
+Then
+
+```
+|0>
+
+×
+
+|1>
+
+↓
+
+|01>
+```
+
+Interactive builder.
+
+Student combines states.
+
+Matrix appears afterwards.
+
+---
+
+# Lesson 9 — Measurement
+
+Huge animation.
+
+Before measurement
+
+Cloud.
+
+After
+
+Collapse.
+
+Slider
+
+Repeat experiment 1000×
+
+Histogram builds.
+
+Students discover
+
+Probability.
+
+Only afterwards
+
+Hermitian observables.
+
+Eigenvectors.
+
+Expectation values.
+
+---
+
+# Lesson 10 — Hermitian operators
+
+Visual:
+
+Measurement devices.
+
+Choose axis
+
+X
+
+Y
+
+Z
+
+Needle aligns.
+
+Only afterwards
+
+Hermitian matrices.
+
+Explain
+
+Eigenvectors
+
+↓
+
+possible answers
+
+Eigenvalues
+
+↓
+
+measured values.
+
+---
+
+# Lesson 11 — Entanglement
+
+Most important section.
+
+Animation:
+
+Two coins.
+
+Independent.
+
+Then
+
+Tie them together.
+
+Rotate one.
+
+Nothing changes.
+
+Now
+
+Bell pair.
+
+Measurement.
+
+Second state appears instantly correlated.
+
+Important:
+
+Stress
+
+No information travels.
+
+Only correlations.
+
+---
+
+# Lesson 12 — Bell states
+
+Build them.
+
+Start
+
+```
+|00>
+```
+
+Apply
+
+Hadamard
+
+↓
+
+CNOT
+
+Animation:
+
+Probability bars merge.
+
+End with
+
+Bell pair.
+
+Interactive.
+
+---
+
+# Lesson 13 — EPR experiment
+
+Visual experiment.
+
+Alice.
+
+Bob.
+
+Choose measurement angles.
+
+Repeat thousands of trials.
+
+Histogram.
+
+Watch correlations emerge.
+
+Don't begin with Bell inequalities.
+
+End with them.
+
+---
+
+# Explore Laboratory
+
+Exactly like QuasiShor.
+
+Controls:
+
+* Initial state
+* Bloch sphere
+* Gate palette
+* Measurement axis
+* Noise
+* Number of qubits (1–2 initially)
+
+Live panels:
+
+* Bloch sphere
+* State vector
+* Matrix
+* Probability bars
+* Circuit
+* Measurement histogram
+
+Every interaction updates all views simultaneously.
+
+---
+
+# Teaching principles
+
+Every lesson follows the same pattern:
+
+1. **Question** – a motivating puzzle.
+2. **Picture** – an interactive visual.
+3. **Experiment** – learner manipulates the system.
+4. **Pattern** – the learner observes regularities.
+5. **Mathematics** – introduce notation only after intuition.
+6. **Summary** – connect the visual to the formal concept.
+7. **Sandbox** – free exploration.
+
+---
+
+# Technical architecture
+
+Reuse the QuasiShor architecture where practical:
+
+* **React + TypeScript** frontend.
+* **FastAPI** backend (or client-side computation for lightweight linear algebra).
+* Shared **Python core** for state vectors, matrices, tensor products, and measurements.
+* Consistent typography, colour palette, navigation, glossary, and guided lesson structure so it feels like part of the same educational family.
+
+---
+
+# Success criteria
+
+A learner who completes the guided lesson should be able to:
+
+* Explain the difference between a classical bit and a qubit.
+* Interpret a qubit as a state on the Bloch sphere.
+* Understand how measurement changes a quantum state.
+* Describe what the Pauli operators do geometrically and algebraically.
+* Explain why quantum gates are unitary and reversible.
+* Construct simple two-qubit states using tensor products.
+* Recognise the distinction between separable and entangled states.
+* Explain what Bell states represent and why they exhibit non-classical correlations.
+* Read introductory quantum-computing material without the notation feeling unfamiliar.
+
+The educational goal should mirror QuasiShor's: not to train students to build quantum hardware or derive every proof, but to leave them with an accurate mental model of the foundational mathematics that makes quantum algorithms understandable.
