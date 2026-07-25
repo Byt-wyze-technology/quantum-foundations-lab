@@ -34,9 +34,10 @@ companion source of truth for how each one is built.
 | 🟡 PARTIAL | Some deliverables landed; the remainder is named in the section |
 | ⬜ NOT STARTED | No implementation yet |
 
-Current state: the mathematical core is complete and tested (Phase 1), and the
-Explore laboratory is complete for one qubit (Phase 2). The guided lesson
-sections below are next, in Phase 3.
+Current state: the mathematical core is complete and tested (Phase 1), the
+Explore laboratory is complete for one qubit (Phase 2), and the guided lesson
+covers the whole one-qubit path (Phase 3). Lessons 7, 8, 11, 12 and 13 need
+two qubits and arrive in Phases 4 and 5.
 
 ---
 
@@ -72,7 +73,7 @@ Every section answers one question.
 
 ---
 
-# Lesson 0 — Classical bits — ⬜ NOT STARTED
+# Lesson 0 — Classical bits — ✅ COMPLETE — §8.1
 
 Purpose:
 
@@ -102,7 +103,7 @@ Then ask:
 
 ---
 
-# Lesson 1 — The Bloch sphere — ⬜ NOT STARTED
+# Lesson 1 — The Bloch sphere — ✅ COMPLETE — §8.1
 
 Hero visual.
 
@@ -159,7 +160,7 @@ appearing around the sphere.
 
 ---
 
-# Lesson 2 — Spins and polarisation — ⬜ NOT STARTED
+# Lesson 2 — Spins and polarisation — ✅ COMPLETE — §8.2
 
 Don't start with electrons.
 
@@ -199,7 +200,7 @@ Measurement axis.
 
 ---
 
-# Lesson 3 — State vectors — ⬜ NOT STARTED
+# Lesson 3 — State vectors — ✅ COMPLETE — §8.3
 
 Now introduce
 
@@ -235,7 +236,7 @@ complex phase.
 
 ---
 
-# Lesson 4 — Phase — ⬜ NOT STARTED
+# Lesson 4 — Phase — ✅ COMPLETE — §8.3
 
 This is where most students struggle.
 
@@ -263,7 +264,7 @@ complex amplitudes.
 
 ---
 
-# Lesson 5 — Pauli matrices — ⬜ NOT STARTED
+# Lesson 5 — Pauli matrices — ✅ COMPLETE — §8.4
 
 Instead of
 
@@ -315,7 +316,7 @@ with every animation linked to matrix multiplication.
 
 ---
 
-# Lesson 6 — Unitary operations — ⬜ NOT STARTED
+# Lesson 6 — Unitary operations — ✅ COMPLETE — §8.5
 
 Visual:
 
@@ -425,7 +426,7 @@ Matrix appears afterwards.
 
 ---
 
-# Lesson 9 — Measurement — ⬜ NOT STARTED
+# Lesson 9 — Measurement — ✅ COMPLETE — §8.7
 
 Huge animation.
 
@@ -457,7 +458,7 @@ Expectation values.
 
 ---
 
-# Lesson 10 — Hermitian operators — ⬜ NOT STARTED
+# Lesson 10 — Hermitian operators — ✅ COMPLETE — §8.8
 
 Visual:
 
@@ -607,7 +608,7 @@ Every interaction updates all views simultaneously.
 
 ---
 
-# Teaching principles — ⬜ NOT STARTED
+# Teaching principles — ✅ COMPLETE — every built section follows this pattern, checked by sections.test.tsx
 
 Every lesson follows the same pattern:
 

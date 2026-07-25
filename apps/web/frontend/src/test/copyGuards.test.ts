@@ -26,12 +26,15 @@ const sources = collectSources(SOURCE_ROOT).map((path) => ({
   text: readFileSync(path, "utf8"),
 }));
 
-/** Strip the qualified explanations that are allowed to mention a forbidden phrase. */
+/**
+ * Strip the one place a forbidden phrase is allowed to appear: the `wrong`
+ * field of a misconception guard, which exists precisely to quote the bad
+ * phrasing and cross it out (§8.1). The exemption is narrow on purpose — it
+ * covers that field and nothing else, and the tests below check that every
+ * such field is genuinely paired with a correction.
+ */
 const withoutGuardedMentions = (text: string): string =>
-  text
-    // The misconception guard itself quotes the wrong phrasing in order to reject it.
-    .replace(/Do not say[\s\S]{0,400}?Use:/g, "")
-    .replace(/never says?[^\n]*\n/g, "");
+  text.replace(/wrong:\s*(["'])(?:\\.|(?!\1).)*\1/gs, "wrong: <quoted misconception>");
 
 describe("misconception guards", () => {
   it("never claims a qubit is both 0 and 1", () => {
@@ -74,6 +77,35 @@ describe("misconception guards", () => {
       return forbidden.test(stripped);
     });
     expect(offenders.map((entry) => entry.path)).toEqual([]);
+  });
+});
+
+describe("misconception guards are honest", () => {
+  it("pairs every quoted misconception with a correction", async () => {
+    const { LESSON_SECTIONS } = await import("../lesson/sections");
+    for (const section of LESSON_SECTIONS) {
+      expect(section.misconception.wrong.trim().length, section.id).toBeGreaterThan(0);
+      expect(section.misconception.right.trim().length, section.id).toBeGreaterThan(0);
+      expect(section.misconception.wrong, section.id).not.toEqual(section.misconception.right);
+    }
+  });
+
+  it("keeps the forbidden phrasings out of every field except `wrong`", async () => {
+    const { LESSON_SECTIONS } = await import("../lesson/sections");
+    const forbidden = /\bboth\s+0\s+and\s+1\b/i;
+    for (const section of LESSON_SECTIONS) {
+      const prose = [
+        section.title,
+        section.summary,
+        section.misconception.right,
+        ...section.equations.map((equation) => equation.gloss),
+        ...section.checkpoints.flatMap((checkpoint) => [
+          checkpoint.question,
+          ...checkpoint.options.flatMap((option) => [option.label, option.response]),
+        ]),
+      ].join(" ");
+      expect(forbidden.test(prose), section.id).toBe(false);
+    }
   });
 });
 

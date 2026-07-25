@@ -259,6 +259,8 @@ main {
 .section {
   padding: 100px max(28px, 8vw);
   border-top: 1px solid var(--line);
+  /* Clears the sticky navigation when an anchor link jumps to a section. */
+  scroll-margin-top: 78px;
 }
 
 .section h2 {
@@ -806,6 +808,459 @@ select {
 .circuit-chip.latest {
   border-color: var(--ink);
   background: var(--mint);
+}
+
+/* --- Guided lesson sections ---------------------------------------------- */
+
+.lesson-visual {
+  margin: 10px 0 34px;
+}
+
+.lesson-stack {
+  display: grid;
+  gap: 40px;
+}
+
+.lesson-stack h3,
+.split-half h3,
+.measurement-column h3,
+.observable-column h3,
+.unitary-readout h3 {
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+}
+
+.lesson-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 30px;
+  align-items: start;
+  margin-bottom: 34px;
+}
+
+.misconception {
+  border-left: 3px solid var(--coral);
+  padding: 4px 0 4px 20px;
+}
+
+.misconception p {
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+
+.misconception-wrong {
+  color: #8a6a63;
+  text-decoration: line-through;
+  text-decoration-color: #ef7c6488;
+}
+
+.misconception-right {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.misconception span[aria-hidden] {
+  display: inline-block;
+  width: 18px;
+  font-weight: 800;
+}
+
+.misconception-wrong span[aria-hidden] {
+  color: var(--coral-deep);
+}
+
+.misconception-right span[aria-hidden] {
+  color: var(--mint-deep);
+}
+
+.maths-reveal {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.equation-list {
+  display: grid;
+  gap: 22px;
+  margin-top: 16px;
+}
+
+.equation-item .caption {
+  margin-top: 4px;
+  font-family: Manrope, system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.sandbox-link {
+  margin-top: 26px;
+}
+
+.dark .misconception-wrong {
+  color: #b09a94;
+}
+
+.dark .misconception-right,
+.dark .reading b {
+  color: white;
+}
+
+.dark .panel,
+.dark .quiz-card {
+  background: #17302f;
+  color: #eaf0ed;
+  box-shadow: none;
+  border-color: #3a4d4b;
+}
+
+.dark .quiz-card button {
+  background: #122626;
+  border-color: #3a4d4b;
+  color: #eaf0ed;
+}
+
+.dark .caption {
+  color: #93a5a2;
+}
+
+/* --- Checkpoint ---------------------------------------------------------- */
+
+.quiz-card {
+  max-width: 760px;
+  margin: 0 auto;
+  background: white;
+  padding: 34px 40px 40px;
+  box-shadow: 0 15px 50px #10222413;
+}
+
+.quiz-card > p:first-child {
+  margin: 0;
+}
+
+.quiz-question {
+  font-size: 19px;
+  color: var(--ink);
+  line-height: 1.5;
+  margin: 12px 0 20px;
+}
+
+.quiz-card button {
+  width: 100%;
+  text-align: left;
+  padding: 16px;
+  margin: 5px 0;
+  border: 1px solid var(--line);
+  background: #f6f4ed;
+  line-height: 1.5;
+  min-height: 44px;
+}
+
+.quiz-card button.correct {
+  border-color: #38a57f;
+  background: #75d5b326;
+}
+
+.quiz-card button.wrong {
+  border-color: var(--coral);
+  background: #ef7c6415;
+}
+
+.feedback {
+  color: var(--coral-deep) !important;
+  line-height: 1.6;
+  margin-top: 14px;
+}
+
+.feedback.good {
+  color: #268567 !important;
+}
+
+.reading {
+  font: 13px DM Mono;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.reading b {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+/* --- §8.1 split panel ---------------------------------------------------- */
+
+.split-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.split-half {
+  background: var(--panel);
+  padding: 30px;
+  text-align: center;
+  min-width: 0;
+}
+
+.split-half .caption {
+  max-width: 380px;
+  margin: 12px auto 0;
+}
+
+.bit-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 46px 0;
+}
+
+.bit-switch button {
+  font: 500 22px DM Mono;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--line);
+  background: #f7f4ed;
+  color: var(--muted);
+}
+
+.bit-switch button.active {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+
+.bit-track {
+  position: relative;
+  width: 108px;
+  height: 38px;
+  border: 1px solid var(--line);
+  background: #e4e0d5;
+  border-radius: 19px;
+}
+
+.bit-thumb {
+  position: absolute;
+  top: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--coral);
+  transition: left 0.18s ease;
+}
+
+/* --- §8.2 analyser and Stern–Gerlach ------------------------------------- */
+
+.analyser svg,
+.stern-gerlach svg {
+  width: 100%;
+  max-width: 560px;
+  display: block;
+  margin: 0 auto;
+}
+
+.diagram-label {
+  font: 500 11px "DM Mono", monospace;
+  fill: #798482;
+}
+
+.analyser-readouts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  margin: 18px 0;
+}
+
+.analyser-readouts > div {
+  background: var(--panel);
+  padding: 16px 20px;
+}
+
+.analyser-readouts small {
+  display: block;
+  font: 10px DM Mono;
+  letter-spacing: 0.1em;
+  color: var(--muted-soft);
+}
+
+.analyser-readouts strong {
+  display: block;
+  font: 26px DM Mono;
+  margin: 6px 0 2px;
+}
+
+.analyser-readouts span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gate-palette button.active {
+  background: var(--ink);
+  color: white;
+}
+
+/* --- §8.3 phase laboratory ----------------------------------------------- */
+
+.phase-lab {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(280px, 1.1fr) minmax(220px, 0.85fr);
+  gap: 30px;
+  align-items: start;
+}
+
+.phase-views {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.phase-views > * {
+  width: 100%;
+}
+
+.phase-predictions {
+  display: grid;
+  gap: 16px;
+}
+
+.prediction-card {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 20px;
+}
+
+.prediction-card p {
+  font: 14px DM Mono;
+  margin: 10px 0 0;
+}
+
+.prediction-card b {
+  font-size: 18px;
+}
+
+/* --- §8.4 Pauli ---------------------------------------------------------- */
+
+.pauli-lab,
+.unitary-lab,
+.observable-lab {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(300px, 1.1fr);
+  gap: 36px;
+  align-items: start;
+}
+
+.pauli-stage,
+.unitary-stage {
+  text-align: center;
+}
+
+.before-after {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+
+/* --- §8.5 unitary -------------------------------------------------------- */
+
+.matrix-input {
+  display: grid;
+  grid-template-columns: repeat(2, 92px);
+  gap: 8px;
+}
+
+.matrix-input input {
+  padding: 10px;
+  border: 1px solid #b9b9b2;
+  background: #f7f4ed;
+  font: 13px DM Mono;
+  min-height: 44px;
+  width: 100%;
+}
+
+/* --- §8.7 measurement ---------------------------------------------------- */
+
+.measurement-lab {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 30px;
+  align-items: start;
+}
+
+.measurement-column {
+  min-width: 0;
+}
+
+.collapse-card {
+  border: 1px solid var(--coral);
+  background: #ef7c640f;
+  padding: 20px;
+  margin-top: 18px;
+  text-align: center;
+}
+
+.collapse-card p {
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* --- §8.8 observables ---------------------------------------------------- */
+
+.outcome-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.outcome-list li {
+  display: grid;
+  grid-template-columns: 62px 1fr 92px;
+  gap: 12px;
+  align-items: center;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+
+.outcome-list li:first-child {
+  border-top: 0;
+}
+
+.outcome-eigenvalue {
+  font: 500 16px DM Mono;
+}
+
+@media (max-width: 1100px) {
+  .phase-lab,
+  .measurement-lab {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pauli-lab,
+  .unitary-lab,
+  .observable-lab,
+  .lesson-footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 850px) {
+  .split-panel,
+  .phase-lab,
+  .measurement-lab,
+  .analyser-readouts,
+  .before-after {
+    grid-template-columns: 1fr;
+  }
+
+  .quiz-card {
+    padding: 26px 20px 30px;
+  }
 }
 
 /* --- Glossary ------------------------------------------------------------ */

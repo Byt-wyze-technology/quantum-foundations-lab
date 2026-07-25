@@ -1,26 +1,29 @@
 /**
  * The guided lesson.
  *
- * Phase 2 delivers the hero that opens it. The data-driven sections of §7 and
- * §8 — classical bit, qubit, polarisation, spin, phase, Pauli, unitary,
- * measurement and observables — are Phase 3, and the two-qubit and EPR
- * sections are Phases 4 and 5.
+ * Phase 3 delivers the one-qubit path: §8.1–§8.5, §8.7 and §8.8. Tensor
+ * products, entanglement, Bell states and EPR join it in Phases 4 and 5.
  */
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { ketPlus, qubitFromAngles } from "../math";
+import { usePreferences } from "../ui/preferences";
 import { BlochSphere } from "../viz/BlochSphere";
+import { LessonSectionView } from "./LessonSectionView";
+import { LESSON_SECTIONS } from "./sections";
 
-export function LessonFlow() {
+function HeroSphere() {
+  const reducedMotion = usePreferences((state) => state.reducedMotion);
   const [state, setState] = useState(ketPlus);
   const [drifting, setDrifting] = useState(true);
 
-  // A slow drift makes the hero feel alive; interacting with it stops the
-  // drift so the learner is never fighting the animation for control.
+  // A slow drift makes the hero feel alive. Touching it stops the drift, so
+  // the learner is never fighting the animation for control, and reduced-motion
+  // preferences switch it off entirely (§16).
   useEffect(() => {
-    if (!drifting) return undefined;
+    if (!drifting || reducedMotion) return undefined;
     let frame = 0;
     let raf = 0;
     const tick = () => {
@@ -30,8 +33,25 @@ export function LessonFlow() {
     };
     raf = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(raf);
-  }, [drifting]);
+  }, [drifting, reducedMotion]);
 
+  return (
+    <BlochSphere
+      state={state}
+      interactive
+      showAxes
+      showPhaseArc
+      size={430}
+      onStateChange={(next) => {
+        setDrifting(false);
+        setState(next);
+      }}
+      label="The state of a single qubit"
+    />
+  );
+}
+
+export function LessonFlow() {
   return (
     <main>
       <section className="hero">
@@ -47,43 +67,46 @@ export function LessonFlow() {
             Start with a picture you can move, notice what changes and what stubbornly does not,
             and let the notation arrive once it has something to describe.
           </p>
-          <Link className="button primary" to="/explore">
-            Open the laboratory <span>→</span>
+          <a className="button primary" href={`#${LESSON_SECTIONS[0]!.id}`}>
+            Start the lesson <span>↓</span>
+          </a>
+          <Link className="button ghost" to="/explore">
+            Open the laboratory
           </Link>
         </div>
         <div className="hero-art">
-          <BlochSphere
-            state={state}
-            interactive
-            showAxes
-            showPhaseArc
-            size={430}
-            onStateChange={(next) => {
-              setDrifting(false);
-              setState(next);
-            }}
-            label="The state of a single qubit"
-          />
+          <HeroSphere />
         </div>
       </section>
 
+      {LESSON_SECTIONS.map((section) => (
+        <LessonSectionView key={section.id} section={section} />
+      ))}
+
       <section className="section stage">
         <header>
-          <span className="step">01</span>
+          <span className="step">→</span>
           <div>
-            <span className="eyebrow mint">THE GUIDED LESSON</span>
-            <h2>Fourteen sections, one idea at a time.</h2>
+            <span className="eyebrow mint">WHAT COMES NEXT</span>
+            <h2>One qubit understood. Now two.</h2>
             <p>
-              Each section asks one question, gives you something to manipulate, waits for you to
-              notice the pattern, and only then writes down the mathematics. The Explore
-              laboratory is open the whole time.
+              Everything so far concerned a single qubit, where a Bloch sphere tells the whole
+              story. Two qubits break that picture — and the way it breaks is exactly what makes
+              entanglement worth the name. Those sections are being built.
             </p>
           </div>
         </header>
-        <p className="notice">
-          The guided sections are being built. The Explore laboratory is complete for one qubit —
-          prepare a state, rotate it with gates, choose a measurement axis and gather statistics.
-        </p>
+        <div className="finish">
+          <h2>Take it apart yourself.</h2>
+          <p>
+            The laboratory has every control from these sections in one place: prepare any state,
+            apply any gate, point the measurement device wherever you like, and gather as many
+            shots as you want.
+          </p>
+          <Link className="button primary" to="/explore">
+            Enter the laboratory <span>→</span>
+          </Link>
+        </div>
       </section>
     </main>
   );

@@ -28,7 +28,7 @@ work first.
 | --- | --- | --- |
 | 1 — Mathematical core | ✅ COMPLETE | All mathematical invariants pass — 229 tests, ruff and mypy clean |
 | 2 — One-qubit Explore lab | ✅ COMPLETE | Met — presets, drag and keyboard construct any pure state; gates and rotations turn it; any measurement axis and shot count measure it. 75 frontend tests |
-| 3 — Guided one-qubit lesson | ⬜ NOT STARTED | Every section has visual, experiment, mathematics and checkpoint |
+| 3 — Guided one-qubit lesson | ✅ COMPLETE | Met and enforced by test — all seven sections carry a visual, an experiment, revealable mathematics and a checkpoint. 103 frontend tests, 256 Python tests |
 | 4 — Two-qubit system | ⬜ NOT STARTED | Students can distinguish product and entangled states |
 | 5 — EPR and Bell correlations | ⬜ NOT STARTED | Ideal correlations shown without implying communication |
 | 6 — Open-source release | ⬜ NOT STARTED | Docs, CI, figures and release package |
@@ -838,7 +838,16 @@ selectExpectationValues()
 
 ---
 
-# 7. Guided lesson implementation — ⬜ NOT STARTED
+# 7. Guided lesson implementation — ✅ COMPLETE
+
+*Implemented as data-driven sections in `apps/web/frontend/src/lesson/`. The
+`LessonSection` type carries every field below, and `sections.test.tsx`
+asserts that each section supplies introductory copy, a live visual,
+revealable mathematics, a misconception guard, a knowledge check and a link
+into Explore with the state preloaded — so Phase 3's exit criterion is checked
+by the suite rather than by reading the page. The canonical section spine also
+lives in `quantum_foundations/lessons/content.py`, and
+`tests/integration/test_lesson_consistency.py` fails if the two drift apart.*
 
 The guided lesson should be implemented as data-driven sections rather than one monolithic component.
 
@@ -882,7 +891,11 @@ Each section should support:
 
 ---
 
-# 8. Detailed lesson modules — ⬜ NOT STARTED
+# 8. Detailed lesson modules — 🟡 PARTIAL
+
+*§8.1–§8.5, §8.7 and §8.8 are implemented (Phase 3). §8.6 (tensor products),
+§8.9 (entanglement) and §8.10 (Bell-state builder) arrive in Phase 4;
+§8.11 (EPR and CHSH) in Phase 5.*
 
 ## 8.1 Classical bit versus qubit
 
@@ -1981,7 +1994,7 @@ Exit criterion:
 
 A learner can construct, rotate and measure arbitrary pure one-qubit states.
 
-## Phase 3 — Guided one-qubit lesson — ⬜ NOT STARTED
+## Phase 3 — Guided one-qubit lesson — ✅ COMPLETE
 
 Deliver:
 
