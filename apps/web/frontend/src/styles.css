@@ -31,6 +31,10 @@
   --panel: #f8f5ee;
   --control: #e6e2d8;
 
+  /* One source of truth: the sticky Explore toolbar and the anchor-scroll
+     offset both derive from this, so they cannot drift out of step with it. */
+  --nav-height: 78px;
+
   /* The Bloch sphere is drawn on a canvas, which cannot inherit CSS. It reads
      these four values at draw time so it matches whatever surface it sits on. */
   --bloch-fill: rgba(255, 255, 255, 0.55);
@@ -96,7 +100,7 @@ button {
 /* --- Navigation ---------------------------------------------------------- */
 
 nav {
-  height: 78px;
+  height: var(--nav-height);
   padding: 0 max(28px, 5vw);
   display: flex;
   align-items: center;
@@ -267,7 +271,7 @@ main {
   padding: 100px max(28px, 8vw);
   border-top: 1px solid var(--line);
   /* Clears the sticky navigation when an anchor link jumps to a section. */
-  scroll-margin-top: 78px;
+  scroll-margin-top: var(--nav-height);
 }
 
 .section h2 {
@@ -1907,17 +1911,37 @@ footer small {
   overflow: visible;
 }
 
-.explore-mode nav {
-  height: 58px;
+/* Explore is a working dashboard, so the bar is shorter and the height it
+   gives up goes to the panels. */
+.explore-mode {
+  --nav-height: 58px;
 }
 
-.explore-toolbar {
+/* Controls live in a sticky column beside the panels rather than a bar above
+   them. A dashboard has horizontal room to spare and very little vertical:
+   pinning a strip tall enough to hold every control left barely half the
+   viewport for the panels, and the panels scrolled underneath it. In a column
+   the controls stay reachable at any scroll position and cost no height. */
+.explore-layout {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.explore-controls {
   position: sticky;
-  top: 58px;
-  z-index: 15;
-  background: rgba(243, 240, 232, 0.97);
-  padding: 8px 0 10px;
-  backdrop-filter: blur(12px);
+  top: calc(var(--nav-height) + 10px);
+  max-height: calc(100vh - var(--nav-height) - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.explore-panels {
+  min-width: 0;
 }
 
 .explore-head {
@@ -1925,7 +1949,7 @@ footer small {
   align-items: end;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .explore-head > div {
@@ -1956,13 +1980,41 @@ footer small {
 
 .explore .lab-controls {
   margin: 0;
-  padding: 10px 12px;
-  gap: 12px;
-  align-items: flex-end;
+  padding: 12px;
+  gap: 11px;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .explore .lab-controls label {
   min-width: 0;
+}
+
+.explore .lab-controls > div[role="group"] {
+  flex: none !important;
+}
+
+/* Undo, Reset and Share sit together on one line rather than stacking. */
+.explore .lab-controls .button {
+  margin: 0;
+  flex: 1 1 auto;
+  justify-content: center;
+  gap: 0;
+  padding: 12px 8px;
+  font-size: 12px;
+}
+
+.control-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Two narrow controls share a line, which keeps the sticky column short
+   enough to remain pinned for the whole of the page's scroll. */
+.control-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .explore .lab-controls input,
@@ -1975,21 +2027,22 @@ footer small {
 }
 
 .explore .stats {
-  margin: 8px 0 0;
+  margin: 0;
+  grid-template-columns: 1fr 1fr;
 }
 
 .explore .stats > div {
-  padding: 9px 12px;
+  padding: 8px 10px;
 }
 
 .explore .stats strong {
-  margin-top: 3px;
-  font-size: 16px;
+  margin-top: 2px;
+  font-size: 15px;
 }
 
 .lab-dashboard {
   display: grid;
-  grid-template-columns: minmax(300px, 0.95fr) minmax(320px, 1.1fr) minmax(320px, 1.1fr);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 10px;
   align-items: start;
 }
@@ -2019,8 +2072,24 @@ footer small {
 /* --- Responsive ---------------------------------------------------------- */
 
 @media (max-width: 1100px) {
-  .lab-dashboard {
-    grid-template-columns: 1fr 1fr;
+  .explore-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-controls {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .explore .lab-controls {
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .explore .stats {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -2044,10 +2113,6 @@ footer small {
 
   .stats {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .explore-toolbar {
-    position: static;
   }
 
   .explore-head {

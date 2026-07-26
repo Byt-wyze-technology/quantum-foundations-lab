@@ -83,8 +83,7 @@ export function ExplorePanel() {
 
   return (
     <main className="explore">
-      <div className="explore-toolbar">
-        <div className="explore-head">
+      <div className="explore-head">
           <div>
             <span className="eyebrow mint">EXPLORE LABORATORY</span>
             <h1>{isTwoQubit ? "Two qubits, one joint state." : "One qubit, every view at once."}</h1>
@@ -94,19 +93,39 @@ export function ExplorePanel() {
               ? "Build a pair, entangle it, and watch what each qubit keeps and what it loses. The reduced states, the correlation table and the indicator all describe the same pair."
               : "Prepare a state, rotate it with gates, choose what to measure, then repeat the experiment. The Bloch sphere, the amplitudes, the matrix and the statistics all describe the same qubit."}
           </p>
-        </div>
+      </div>
 
-        <div className="lab-controls">
-          <label>
-            Qubits
-            <select
-              value={currentState.qubitCount}
-              onChange={(event) => store.setQubitCount(Number(event.target.value) as QubitCount)}
-            >
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-            </select>
-          </label>
+      {/* A dashboard should spend horizontal space, not vertical. The controls
+          sit in a sticky column so they stay reachable however far the panels
+          scroll, instead of pinning a third of the viewport across the top. */}
+      <div className="explore-layout">
+        <aside className="explore-controls" aria-label="Laboratory controls">
+          <div className="lab-controls">
+
+          <div className="control-pair">
+            <label>
+              Qubits
+              <select
+                value={currentState.qubitCount}
+                onChange={(event) => store.setQubitCount(Number(event.target.value) as QubitCount)}
+              >
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+              </select>
+            </label>
+            <label>
+              Seed
+              <input
+                type="number"
+                value={seed ?? ""}
+                placeholder="none"
+                onChange={(event) =>
+                  store.setSeed(event.target.value === "" ? null : Number(event.target.value))
+                }
+                title="Set a seed to make a classroom demonstration reproducible"
+              />
+            </label>
+          </div>
 
           {/* A group of buttons, not a labelled control: a <label> here would
               attach its whole text to the first button's accessible name. */}
@@ -180,28 +199,18 @@ export function ExplorePanel() {
             </>
           )}
 
-          <label>
-            Seed
-            <input
-              type="number"
-              value={seed ?? ""}
-              placeholder="none"
-              onChange={(event) =>
-                store.setSeed(event.target.value === "" ? null : Number(event.target.value))
-              }
-              title="Set a seed to make a classroom demonstration reproducible"
-            />
-          </label>
 
-          <button type="button" className="button ghost" onClick={() => store.undoGate()}>
-            Undo
-          </button>
-          <button type="button" className="button ghost" onClick={() => store.resetCircuit()}>
-            Reset
-          </button>
-          <button type="button" className="button ghost" onClick={shareState}>
-            {copied ? "Link copied" : "Share state"}
-          </button>
+          <div className="control-actions">
+            <button type="button" className="button ghost" onClick={() => store.undoGate()}>
+              Undo
+            </button>
+            <button type="button" className="button ghost" onClick={() => store.resetCircuit()}>
+              Reset
+            </button>
+            <button type="button" className="button ghost" onClick={shareState}>
+              {copied ? "Link copied" : "Share"}
+            </button>
+          </div>
         </div>
 
         {expectations && (
@@ -219,7 +228,7 @@ export function ExplorePanel() {
               <strong>{expectations.z.toFixed(3)}</strong>
             </div>
             <div>
-              <small className="literal">⟨σ·n⟩ — chosen axis</small>
+              <small className="literal">⟨σ·n⟩ axis</small>
               <strong>{expectations.axis.toFixed(3)}</strong>
             </div>
           </div>
@@ -245,18 +254,21 @@ export function ExplorePanel() {
             </div>
           </div>
         )}
+        </aside>
+
+        <div className="explore-panels">
+          {error && (
+            <p className="error" role="alert">
+              {error}{" "}
+              <button type="button" className="glossary-button" onClick={() => store.clearError()}>
+                Dismiss
+              </button>
+            </p>
+          )}
+
+          {isTwoQubit ? <TwoQubitDashboard /> : <OneQubitDashboard />}
+        </div>
       </div>
-
-      {error && (
-        <p className="error" role="alert">
-          {error}{" "}
-          <button type="button" className="glossary-button" onClick={() => store.clearError()}>
-            Dismiss
-          </button>
-        </p>
-      )}
-
-      {isTwoQubit ? <TwoQubitDashboard /> : <OneQubitDashboard />}
     </main>
   );
 }

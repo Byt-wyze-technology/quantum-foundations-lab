@@ -7,7 +7,7 @@
  */
 
 import { useState } from "react";
-import { NavLink, Route, Routes } from "react-router-dom";
+import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 
 import { ExplorePanel } from "./explore/ExplorePanel";
 import { LessonFlow } from "./lesson/LessonFlow";
@@ -27,11 +27,15 @@ const Brand = ({ inverse = false }: { inverse?: boolean }) => (
 export default function App() {
   const [glossaryOpen, setGlossaryOpen] = useState(false);
   const { highContrast, reducedMotion, toggleHighContrast, toggleReducedMotion } = usePreferences();
+  // Explore is a working dashboard rather than a reading surface, so it gets
+  // a shorter navigation bar and gives the extra height back to the panels.
+  const isExplore = useLocation().pathname.startsWith("/explore");
 
   return (
     <div
       className={[
         "app",
+        isExplore ? "explore-mode" : "",
         highContrast ? "high-contrast" : "",
         reducedMotion ? "reduced-motion" : "",
       ]
