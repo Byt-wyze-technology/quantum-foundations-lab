@@ -30,7 +30,7 @@ work first.
 | 2 — One-qubit Explore lab | ✅ COMPLETE | Met — presets, drag and keyboard construct any pure state; gates and rotations turn it; any measurement axis and shot count measure it. 75 frontend tests |
 | 3 — Guided one-qubit lesson | ✅ COMPLETE | Met and enforced by test — all seven sections carry a visual, an experiment, revealable mathematics and a checkpoint. 103 frontend tests, 256 Python tests |
 | 4 — Two-qubit system | ✅ COMPLETE | Met — side-by-side product/Bell comparison, reduced states drawn at true arrow length, concurrence indicator and correlation table. 125 frontend tests, 265 Python tests |
-| 5 — EPR and Bell correlations | ⬜ NOT STARTED | Ideal correlations shown without implying communication |
+| 5 — EPR and Bell correlations | ✅ COMPLETE | Met — E(θ) = −cosθ reproduced exactly, |S| reaches 2√2, and both marginals are pinned at 50% for every pair of settings, which is no-signalling made checkable. 146 frontend tests, 309 Python tests |
 | 6 — Open-source release | ⬜ NOT STARTED | Docs, CI, figures and release package |
 
 ---
@@ -890,11 +890,11 @@ Each section should support:
 
 ---
 
-# 8. Detailed lesson modules — 🟡 PARTIAL
+# 8. Detailed lesson modules — ✅ COMPLETE
 
-*§8.1–§8.10 are implemented: the one-qubit path in Phase 3, and tensor
-products, entanglement and the Bell-state builder in Phase 4. Only §8.11
-(EPR and CHSH) remains, in Phase 5.*
+*All eleven modules are implemented: the one-qubit path in Phase 3, tensor
+products, entanglement and the Bell-state builder in Phase 4, and EPR with
+CHSH in Phase 5.*
 
 ## 8.1 Classical bit versus qubit — ✅ COMPLETE
 
@@ -1283,7 +1283,7 @@ At each step update:
 
 ---
 
-## 8.11 EPR and Bell correlations — ⬜ NOT STARTED
+## 8.11 EPR and Bell correlations — ✅ COMPLETE
 
 The first release should teach EPR correlations without claiming to provide a full loophole-free Bell-test simulation.
 
@@ -2039,7 +2039,7 @@ Exit criterion:
 
 Students can distinguish product and entangled states.
 
-## Phase 5 — EPR and Bell correlations — ⬜ NOT STARTED
+## Phase 5 — EPR and Bell correlations — ✅ COMPLETE
 
 Deliver:
 

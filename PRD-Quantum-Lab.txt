@@ -34,10 +34,10 @@ companion source of truth for how each one is built.
 | 🟡 PARTIAL | Some deliverables landed; the remainder is named in the section |
 | ⬜ NOT STARTED | No implementation yet |
 
-Current state: the mathematical core is complete and tested (Phase 1), the
-Explore laboratory is complete for one and two qubits (Phases 2 and 4), and the
-guided lesson runs from the classical bit through to Bell states (Phases 3 and
-4). Only Lesson 13, the EPR experiment, remains — Phase 5.
+Current state: every lesson below is built, and the Explore laboratory is
+complete for one and two qubits (Phases 1–5). What remains is Phase 6: the
+FastAPI backend, the Streamlit app, end-to-end tests, documentation, figures,
+CI and the release package.
 
 ---
 
@@ -560,7 +560,7 @@ Interactive.
 
 ---
 
-# Lesson 13 — EPR experiment — ⬜ NOT STARTED
+# Lesson 13 — EPR experiment — ✅ COMPLETE — §8.11
 
 Visual experiment.
 
@@ -633,7 +633,7 @@ Reuse the QuasiShor architecture where practical:
 
 ---
 
-# Success criteria — ⬜ NOT STARTED
+# Success criteria — 🟡 PARTIAL — every listed ability is now taught and testable; a learner-facing review belongs with the Phase 6 release
 
 A learner who completes the guided lesson should be able to:
 

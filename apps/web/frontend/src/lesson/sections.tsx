@@ -1,21 +1,23 @@
 /**
- * The guided lesson's sections (§7, §8.1–§8.8).
+ * The guided lesson's sections (§7, §8.1–§8.11).
  *
- * Phase 3 covers the one-qubit path. §8.6 (tensor products), §8.9
- * (entanglement), §8.10 (Bell states) and §8.11 (EPR) join this list in
- * Phases 4 and 5.
+ * Phase 3 covers the one-qubit path, Phase 4 adds §8.6 (tensor products),
+ * §8.9 (entanglement) and §8.10 (Bell states), and Phase 5 closes with §8.11
+ * (EPR and CHSH).
  *
  * Mapping to the PRD's lesson numbering:
  *   Lessons 0–1 → §8.1   Lesson 2 → §8.2   Lessons 3–4 → §8.3
- *   Lesson 5   → §8.4   Lesson 6 → §8.5   Lesson 9  → §8.7
- *   Lesson 10  → §8.8
+ *   Lesson 5   → §8.4   Lesson 6 → §8.5   Lessons 7–8 → §8.6
+ *   Lesson 9   → §8.7   Lesson 10 → §8.8  Lesson 11 → §8.9
+ *   Lesson 12  → §8.10  Lesson 13 → §8.11
  */
 
-import { bellPhiPlus, ket0, ketPlus, qubitFromAngles, tensorProduct } from "../math";
+import { bellPhiPlus, bellPsiMinus, ket0, ketPlus, qubitFromAngles, tensorProduct } from "../math";
 import { AmplitudesAndPhase } from "./visuals/AmplitudesAndPhase";
 import { BellStateBuilder } from "./visuals/BellStateBuilder";
 import { ClassicalBitVsQubit } from "./visuals/ClassicalBitVsQubit";
 import { EntanglementComparison } from "./visuals/EntanglementComparison";
+import { EprExperiment } from "./visuals/EprExperiment";
 import { TensorProductBuilder } from "./visuals/TensorProductBuilder";
 import { MeasurementLab } from "./visuals/MeasurementLab";
 import { ObservableLab } from "./visuals/ObservableLab";
@@ -628,5 +630,97 @@ export const LESSON_SECTIONS: LessonSection[] = [
     },
     exploreState: bellPhiPlus,
     tone: "plain",
+  },
+
+  {
+    id: "epr",
+    index: 11,
+    eyebrow: "THE ARGUMENT SETTLED",
+    title: "Correlations no list of instructions can fake.",
+    summary:
+      "Einstein, Podolsky and Rosen argued that if measuring here fixes an outcome there, each particle must have carried the answer all along. Bell turned that into a number you can measure. Set the two dials, run the trials, and watch the number go where no such list of answers can follow.",
+    concept: "epr",
+    visual: () => <EprExperiment />,
+    equations: [
+      {
+        latex:
+          "\\left|\\Psi^{-}\\right\\rangle = \\tfrac{1}{\\sqrt2}(\\left|01\\right\\rangle - \\left|10\\right\\rangle)",
+        gloss:
+          "The singlet. Measured along the same axis, the two outcomes are always opposite, whichever axis is chosen.",
+      },
+      {
+        latex: "E(\\theta) = -\\cos\\theta",
+        gloss:
+          "The correlation as a function of the angle between the two analysers. A local hidden-variable model can produce a straight line here, but not this curve.",
+      },
+      {
+        latex: "S = E(a,b) + E(a,b') + E(a',b) - E(a',b')",
+        gloss:
+          "The CHSH combination. Each observer chooses between two settings and the four correlations are combined.",
+      },
+      {
+        latex: "|S| \\leq 2 \\quad \\text{(local hidden variables)}, \\qquad |S|_{\\max} = 2\\sqrt2",
+        gloss:
+          "Any theory where each particle carries its own answers, uninfluenced by the distant setting, obeys the bound of 2. Quantum mechanics reaches 2√2 ≈ 2.828.",
+      },
+    ],
+    checkpoints: [
+      {
+        question:
+          "Alice turns her dial from 0° to 90°. What changes in the results Bob records at his own detector?",
+        options: [
+          {
+            label: "Nothing — his outcomes stay an even 50/50 split",
+            correct: true,
+            response:
+              "Correct, and this is the whole reason no message can be sent. Bob's own statistics are identical whatever Alice does. The correlation only shows up when the two records are compared afterwards.",
+          },
+          {
+            label: "His outcomes become correlated with hers",
+            correct: false,
+            response:
+              "The correlation is a property of the pairs, not something visible in Bob's list alone. His column is 50/50 before and after; you only see the pattern by lining the two columns up.",
+          },
+          {
+            label: "His outcomes flip to the opposite of hers",
+            correct: false,
+            response:
+              "Bob cannot see which way any of his results 'should' have gone without Alice's list. On its own his record is indistinguishable from fair coin flips.",
+          },
+        ],
+      },
+      {
+        question: "What does measuring |S| = 2.8 rule out?",
+        options: [
+          {
+            label:
+              "Any theory where each particle carries its answers and neither is affected by the distant setting",
+            correct: true,
+            response:
+              "Exactly. That is the local hidden-variable assumption, and |S| ≤ 2 is what it forces. Exceeding 2 rules out the whole class, not one particular model.",
+          },
+          {
+            label: "That the particles are communicating faster than light",
+            correct: false,
+            response:
+              "It rules nothing in. Exceeding the bound shows local hidden variables cannot account for the results; it does not show that anything travels, and the marginals confirm nothing does.",
+          },
+          {
+            label: "That quantum mechanics is incomplete",
+            correct: false,
+            response:
+              "That was the EPR conclusion, and Bell's result points the other way: it is the assumption of pre-existing local answers that has to go.",
+          },
+        ],
+      },
+    ],
+    glossaryTerms: ["Entanglement", "Bell state", "Measurement"],
+    misconception: {
+      wrong: "Bell's result proves the particles signal each other faster than light.",
+      right:
+        "It rules out every theory in which each particle carries its answers locally. Nothing is transmitted: each observer's own statistics are unchanged by the other's choice.",
+    },
+    exploreState: bellPsiMinus,
+    tone: "dark",
   },
 ];

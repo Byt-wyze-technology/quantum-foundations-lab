@@ -215,6 +215,22 @@ LESSON_SECTIONS: tuple[LessonSection, ...] = (
         glossary_terms=("Bell state", "Entanglement", "Concurrence"),
         spec_section="8.10",
     ),
+    LessonSection(
+        id="epr",
+        index=11,
+        concept="epr",
+        title="Correlations no list of instructions can fake.",
+        misconception=MisconceptionGuard(
+            wrong="Bell's result proves the particles signal each other faster than light.",
+            right=(
+                "It rules out every theory in which each particle carries its answers "
+                "locally. Nothing is transmitted: each observer's own statistics are "
+                "unchanged by the other's choice."
+            ),
+        ),
+        glossary_terms=("Entanglement", "Bell state", "Measurement"),
+        spec_section="8.11",
+    ),
 )
 
 

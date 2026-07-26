@@ -25,7 +25,7 @@ const renderSection = (section: (typeof LESSON_SECTIONS)[number]) =>
   );
 
 describe("lesson structure", () => {
-  it("covers the concepts Phases 3 and 4 deliver, in teaching order", () => {
+  it("covers the concepts Phases 3 to 5 deliver, in teaching order", () => {
     expect(LESSON_SECTIONS.map((section) => section.concept)).toEqual([
       // Phase 3 — one qubit.
       "classical-bit",
@@ -39,6 +39,8 @@ describe("lesson structure", () => {
       "tensor",
       "entanglement",
       "bell",
+      // Phase 5 — EPR.
+      "epr",
     ]);
   });
 
@@ -111,7 +113,7 @@ describe("lesson rendering", () => {
       const reveal = screen.getByText("Show the mathematics");
       expect(reveal.closest("details")).not.toHaveAttribute("open");
 
-      expect(screen.getByText("CHECKPOINT")).toBeInTheDocument();
+      expect(screen.getAllByText("CHECKPOINT")).toHaveLength(section.checkpoints.length);
       expect(
         screen.getByRole("link", { name: /Try this in the laboratory/ }),
       ).toBeInTheDocument();

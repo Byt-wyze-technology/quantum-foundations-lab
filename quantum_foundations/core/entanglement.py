@@ -16,12 +16,14 @@ import string
 
 import numpy as np
 
+from .observables import eigensystem, spin_observable
 from .states import validate_state
 from .tensor import reshape_state_for_subsystems
-from .types import ComplexMatrix, ComplexVector
+from .types import ComplexMatrix, ComplexVector, RealVector
 from .validation import (
     QuantumValidationError,
     validate_qubit_count,
+    validate_shots,
     validate_square_matrix,
 )
 
@@ -168,6 +170,141 @@ def is_product_state(state: ComplexVector, *, atol: float = 1e-10) -> bool:
         return True
     singular_values = np.linalg.svd(reshape_state_for_subsystems(array, 1), compute_uv=False)
     return bool(singular_values[1] <= atol)
+
+
+def joint_spin_probabilities(
+    state: ComplexVector,
+    axis_a: RealVector | tuple[float, float, float],
+    axis_b: RealVector | tuple[float, float, float],
+) -> dict[tuple[int, int], float]:
+    """Probabilities of the four joint outcomes when Alice measures along
+    ``axis_a`` and Bob along ``axis_b`` (§8.11).
+
+    Keys are ``(alice, bob)`` with each entry ±1.
+    """
+    validate_state(state)
+    array = np.asarray(state, dtype=np.complex128)
+    if array.shape != (4,):
+        raise QuantumValidationError(
+            "NOT_A_TWO_QUBIT_STATE",
+            f"Joint spin measurement needs a two-qubit state; received shape {array.shape}.",
+            shape=list(array.shape),
+        )
+
+    values_a, vectors_a = eigensystem(spin_observable(axis_a))
+    values_b, vectors_b = eigensystem(spin_observable(axis_b))
+
+    probabilities: dict[tuple[int, int], float] = {}
+    for index_a, eigenvalue_a in enumerate(values_a):
+        for index_b, eigenvalue_b in enumerate(values_b):
+            joint = np.kron(vectors_a[:, index_a], vectors_b[:, index_b])
+            amplitude = complex(np.vdot(joint, array))
+            probabilities[(int(round(float(eigenvalue_a))), int(round(float(eigenvalue_b))))] = (
+                float(abs(amplitude) ** 2)
+            )
+    return probabilities
+
+
+def correlation(
+    state: ComplexVector,
+    axis_a: RealVector | tuple[float, float, float],
+    axis_b: RealVector | tuple[float, float, float],
+) -> float:
+    """E(a, b) = ⟨ψ|σ_a ⊗ σ_b|ψ⟩, the average product of the two outcomes.
+
+    For the singlet this equals −cos θ, where θ is the angle between the axes.
+    """
+    joint = joint_spin_probabilities(state, axis_a, axis_b)
+    return float(sum(alice * bob * value for (alice, bob), value in joint.items()))
+
+
+def marginal_probabilities(
+    state: ComplexVector,
+    axis_a: RealVector | tuple[float, float, float],
+    axis_b: RealVector | tuple[float, float, float],
+) -> dict[str, dict[int, float]]:
+    """Each observer's own outcome distribution, ignoring the other's result.
+
+    This is the no-signalling statement made checkable (§8.11, §21): Alice's
+    marginal does not depend on ``axis_b`` at all, so nothing Bob does can
+    change what she sees.
+    """
+    joint = joint_spin_probabilities(state, axis_a, axis_b)
+    alice = {
+        outcome: float(sum(value for (a, _), value in joint.items() if a == outcome))
+        for outcome in (1, -1)
+    }
+    bob = {
+        outcome: float(sum(value for (_, b), value in joint.items() if b == outcome))
+        for outcome in (1, -1)
+    }
+    return {"alice": alice, "bob": bob}
+
+
+def singlet_correlation(theta: float) -> float:
+    """The closed form E(θ) = −cos θ for the singlet (§8.11).
+
+    Kept alongside the general :func:`correlation` so the lesson's curve and
+    the simulation can be checked against each other rather than one being
+    taken on trust.
+    """
+    return float(-np.cos(theta))
+
+
+def chsh_value(
+    state: ComplexVector,
+    a: RealVector | tuple[float, float, float],
+    a_prime: RealVector | tuple[float, float, float],
+    b: RealVector | tuple[float, float, float],
+    b_prime: RealVector | tuple[float, float, float],
+) -> float:
+    """S = E(a,b) + E(a,b′) + E(a′,b) − E(a′,b′).
+
+    A local hidden-variable model obeys |S| ≤ 2; quantum mechanics reaches
+    2√2 ≈ 2.828 for the singlet at the right settings. This is an ideal
+    theoretical model, with no detector inefficiency or locality loopholes
+    represented (§8.11).
+    """
+    return float(
+        correlation(state, a, b)
+        + correlation(state, a, b_prime)
+        + correlation(state, a_prime, b)
+        - correlation(state, a_prime, b_prime)
+    )
+
+
+#: The classical local-hidden-variable bound on |S| (§8.11).
+CHSH_CLASSICAL_BOUND = 2.0
+
+#: The Tsirelson bound, 2√2, the largest |S| quantum mechanics allows.
+CHSH_QUANTUM_BOUND = float(2 * np.sqrt(2))
+
+
+def sample_joint_measurements(
+    state: ComplexVector,
+    axis_a: RealVector | tuple[float, float, float],
+    axis_b: RealVector | tuple[float, float, float],
+    shots: int,
+    *,
+    rng: np.random.Generator,
+) -> dict[tuple[int, int], int]:
+    """Tally ``shots`` independent trials of the Alice/Bob experiment.
+
+    Every trial is a fresh pair prepared in the same state, exactly as with the
+    single-qubit shot batches of §8.7.
+    """
+    validate_shots(shots)
+    joint = joint_spin_probabilities(state, axis_a, axis_b)
+    outcomes = list(joint.keys())
+    weights = np.clip(np.array([joint[key] for key in outcomes], dtype=np.float64), 0.0, 1.0)
+    total = float(weights.sum())
+    if total <= 0.0:
+        raise QuantumValidationError(
+            "DEGENERATE_DISTRIBUTION",
+            "The joint outcome probabilities sum to zero and cannot be sampled.",
+        )
+    counts = rng.multinomial(shots, weights / total)
+    return {outcome: int(count) for outcome, count in zip(outcomes, counts)}
 
 
 def schmidt_coefficients(state: ComplexVector) -> np.ndarray:

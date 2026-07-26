@@ -14,9 +14,19 @@
  * wobble as a slider moves.
  */
 
-import { type Complex, complex, conjugate, magnitude, multiply, scale } from "./complex";
+import {
+  type Complex,
+  complex,
+  conjugate,
+  magnitude,
+  magnitudeSquared,
+  multiply,
+  scale,
+} from "./complex";
 import type { Matrix } from "./gates";
-import type { BlochVector, StateVector } from "./states";
+import { type MeasurementAxis, axisEigenstates } from "./measurement";
+import { type BlochVector, type StateVector, innerProduct } from "./states";
+import { tensorProduct } from "./tensor";
 
 const SQRT_HALF = Math.SQRT1_2;
 
@@ -220,6 +230,131 @@ export const correlationTable = (state: StateVector): {
   const marginalB = probabilities[0]! - probabilities[1]! + probabilities[2]! - probabilities[3]!;
   return { joint, zz, marginalA, marginalB };
 };
+
+/* --- EPR correlations (§8.11) -------------------------------------------- */
+
+export type SpinOutcome = 1 | -1;
+export type JointOutcomeKey = "++" | "+-" | "-+" | "--";
+
+export const JOINT_OUTCOME_KEYS: JointOutcomeKey[] = ["++", "+-", "-+", "--"];
+
+const outcomeKey = (alice: SpinOutcome, bob: SpinOutcome): JointOutcomeKey =>
+  `${alice > 0 ? "+" : "-"}${bob > 0 ? "+" : "-"}` as JointOutcomeKey;
+
+/**
+ * Probabilities of the four joint outcomes when Alice measures along `axisA`
+ * and Bob along `axisB`.
+ *
+ * Computed from the analytic eigenstates of σ_n rather than by numerical
+ * diagonalisation, so the correlation curve stays smooth as the dials turn.
+ */
+export const jointSpinProbabilities = (
+  state: StateVector,
+  axisA: MeasurementAxis,
+  axisB: MeasurementAxis,
+): Record<JointOutcomeKey, number> => {
+  if (state.length !== 4) throw new Error("Joint spin measurement needs a two-qubit state.");
+  const alice = axisEigenstates(axisA);
+  const bob = axisEigenstates(axisB);
+  const result = { "++": 0, "+-": 0, "-+": 0, "--": 0 } as Record<JointOutcomeKey, number>;
+  for (const [aSign, aState] of [
+    [1, alice.plus],
+    [-1, alice.minus],
+  ] as const) {
+    for (const [bSign, bState] of [
+      [1, bob.plus],
+      [-1, bob.minus],
+    ] as const) {
+      const joint = tensorProduct(aState, bState);
+      result[outcomeKey(aSign, bSign)] = magnitudeSquared(innerProduct(joint, state));
+    }
+  }
+  return result;
+};
+
+/** E(a, b) — the average product of the two ±1 outcomes. */
+export const correlation = (
+  state: StateVector,
+  axisA: MeasurementAxis,
+  axisB: MeasurementAxis,
+): number => {
+  const joint = jointSpinProbabilities(state, axisA, axisB);
+  return joint["++"] - joint["+-"] - joint["-+"] + joint["--"];
+};
+
+/**
+ * Each observer's own outcome distribution.
+ *
+ * This is what makes no-signalling checkable rather than merely asserted:
+ * Alice's marginal is 50/50 for every choice of `axisB`, so nothing Bob does
+ * changes what she sees (§8.11, §21).
+ */
+export const marginalProbabilities = (
+  state: StateVector,
+  axisA: MeasurementAxis,
+  axisB: MeasurementAxis,
+): { alice: { plus: number; minus: number }; bob: { plus: number; minus: number } } => {
+  const joint = jointSpinProbabilities(state, axisA, axisB);
+  return {
+    alice: { plus: joint["++"] + joint["+-"], minus: joint["-+"] + joint["--"] },
+    bob: { plus: joint["++"] + joint["-+"], minus: joint["+-"] + joint["--"] },
+  };
+};
+
+/** The closed form for the singlet: E(θ) = −cos θ. */
+export const singletCorrelation = (theta: number): number => -Math.cos(theta);
+
+/** S = E(a,b) + E(a,b′) + E(a′,b) − E(a′,b′). */
+export const chshValue = (
+  state: StateVector,
+  a: MeasurementAxis,
+  aPrime: MeasurementAxis,
+  b: MeasurementAxis,
+  bPrime: MeasurementAxis,
+): number =>
+  correlation(state, a, b) +
+  correlation(state, a, bPrime) +
+  correlation(state, aPrime, b) -
+  correlation(state, aPrime, bPrime);
+
+/** The classical local-hidden-variable bound on |S|. */
+export const CHSH_CLASSICAL_BOUND = 2;
+
+/** The Tsirelson bound, 2√2 — the largest |S| quantum mechanics permits. */
+export const CHSH_QUANTUM_BOUND = 2 * Math.SQRT2;
+
+/** Tally independent trials of the Alice/Bob experiment, one fresh pair each. */
+export const sampleJointMeasurements = (
+  state: StateVector,
+  axisA: MeasurementAxis,
+  axisB: MeasurementAxis,
+  shots: number,
+  random: () => number,
+): Record<JointOutcomeKey, number> => {
+  const joint = jointSpinProbabilities(state, axisA, axisB);
+  const cumulative: number[] = [];
+  let running = 0;
+  for (const key of JOINT_OUTCOME_KEYS) {
+    running += joint[key];
+    cumulative.push(running);
+  }
+  const counts = { "++": 0, "+-": 0, "-+": 0, "--": 0 } as Record<JointOutcomeKey, number>;
+  for (let shot = 0; shot < shots; shot += 1) {
+    const draw = random() * running;
+    let index = JOINT_OUTCOME_KEYS.length - 1;
+    for (let candidate = 0; candidate < cumulative.length; candidate += 1) {
+      if (draw < cumulative[candidate]!) {
+        index = candidate;
+        break;
+      }
+    }
+    counts[JOINT_OUTCOME_KEYS[index]!] += 1;
+  }
+  return counts;
+};
+
+/** An axis in the x–z plane, which is where the EPR dials live. */
+export const planarAxis = (theta: number): MeasurementAxis => ({ theta, phi: 0 });
 
 /** A partially entangled state, for the preset list of §9. */
 export const partiallyEntangled = (weight = 0.9): StateVector => [
