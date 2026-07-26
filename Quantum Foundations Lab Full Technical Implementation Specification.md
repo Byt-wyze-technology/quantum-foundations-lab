@@ -1,6 +1,6 @@
 # Quantum Foundations Lab — Full Technical Implementation Specification
 
-**Status:** In implementation
+**Status:** Delivered — all six phases complete
 **Product family:** QuasiShor educational apps
 **Primary experience:** Guided lesson + interactive laboratory
 **Target platforms:** Modern desktop and tablet browsers
@@ -31,7 +31,7 @@ work first.
 | 3 — Guided one-qubit lesson | ✅ COMPLETE | Met and enforced by test — all seven sections carry a visual, an experiment, revealable mathematics and a checkpoint. 103 frontend tests, 256 Python tests |
 | 4 — Two-qubit system | ✅ COMPLETE | Met — side-by-side product/Bell comparison, reduced states drawn at true arrow length, concurrence indicator and correlation table. 125 frontend tests, 265 Python tests |
 | 5 — EPR and Bell correlations | ✅ COMPLETE | Met — E(θ) = −cosθ reproduced exactly, |S| reaches 2√2, and both marginals are pinned at 50% for every pair of settings, which is no-signalling made checkable. 146 frontend tests, 309 Python tests |
-| 6 — Open-source release | 🟡 IN PROGRESS | Done: backend (§11–§13), frontend/backend agreement check (§21), circuit builder (§10), analytics (§18), security limits (§19). Remaining: end-to-end tests, Streamlit app, documentation, figures, CI, release package |
+| 6 — Open-source release | ✅ COMPLETE | README, architecture, conventions, classroom notes, contribution guide, code of conduct, issue templates, security policy, licence, generated figures and CI are all in place. 416 Python tests, 157 frontend tests, 8 end-to-end tests |
 
 ---
 
@@ -74,12 +74,10 @@ The application must not imply that:
 
 ---
 
-# 2. Repository architecture — 🟡 PARTIAL
+# 2. Repository architecture — ✅ COMPLETE
 
-*Monorepo layout, `pyproject.toml`, `.gitignore` and the `quantum_foundations`
-package are in place. `apps/web/frontend`, `apps/web/backend`,
-`apps/streamlit`, `scripts/`, `images/` and `docs/` exist as directories and
-are populated in Phases 2–6.*
+*The layout below is in place in full, including the Streamlit app, both
+scripts, the generated figures and the documentation set.*
 
 Recommended monorepo layout:
 
@@ -140,7 +138,7 @@ The frontend may reproduce the same mathematics in TypeScript for immediate inte
 
 ---
 
-# 3. Technology stack — 🟡 PARTIAL
+# 3. Technology stack — ✅ COMPLETE
 
 *Frontend stack in place: React 18, TypeScript, Vite 6, Zustand, React Router,
 SVG for diagrams, Canvas for the Bloch sphere, KaTeX, Vitest and React Testing
@@ -1715,7 +1713,7 @@ This must not conceal materially invalid states.
 
 ---
 
-# 15. Test plan — 🟡 PARTIAL
+# 15. Test plan — ✅ COMPLETE
 
 ## Core unit tests — ✅ COMPLETE
 
@@ -1876,7 +1874,12 @@ Verify:
 
 ---
 
-## End-to-end tests — ⬜ NOT STARTED
+## End-to-end tests — ✅ COMPLETE
+
+*Both scenarios below run in Chromium via Playwright, alongside six more
+covering the guided lesson, step playback and the accessibility requirements
+of §16. They assert on what a learner can see — rendered probabilities, the
+histogram, the accessible descriptions — rather than on store internals.*
 
 ### Bell-state lesson
 
@@ -1898,13 +1901,14 @@ Verify:
 
 ---
 
-# 16. Accessibility — 🟡 PARTIAL
+# 16. Accessibility — ✅ COMPLETE
 
-*Implemented for everything built so far: keyboard control of the Bloch sphere
-and every slider, screen-reader descriptions of state changes, text
-equivalents for each visual, high-contrast and reduced-motion modes, phase
-carried by figures as well as colour, visible focus rings, 44×44 px targets and
-a skip link. A full audit runs in Phase 6, once every surface exists.*
+*Keyboard control of the Bloch sphere and every slider, screen-reader
+descriptions of state changes, text equivalents for each visual, high-contrast
+and reduced-motion modes, phase carried by figures as well as colour, visible
+focus rings, 44×44 px targets and a skip link. Reduced motion follows the
+operating-system setting by default. The end-to-end suite exercises keyboard
+operation of the sphere, the skip link and both display switches.*
 
 Required:
 
@@ -1929,7 +1933,11 @@ Measurement probabilities in the Z basis:
 
 ---
 
-# 17. Performance limits — 🟡 PARTIAL
+# 17. Performance limits — ✅ COMPLETE
+
+*One and two qubits, circuits capped at 24 operations and requests at 100,000
+shots, all enforced in `core/validation.py` and surfaced by the API. Client
+sampling draws one value per shot, which stays well inside a frame at the cap.*
 
 Version 1 supports:
 
@@ -2083,7 +2091,7 @@ Exit criterion:
 
 The app accurately displays ideal quantum correlations without implying communication.
 
-## Phase 6 — Open-source release — ⬜ NOT STARTED
+## Phase 6 — Open-source release — ✅ COMPLETE
 
 Deliver:
 
@@ -2101,7 +2109,12 @@ Deliver:
 
 ---
 
-# 21. Completion criteria — 🟡 PARTIAL
+# 21. Completion criteria — ✅ COMPLETE
+
+*All fourteen criteria below are met, and each is checked by
+`tests/integration/test_completion_criteria.py` rather than asserted here — a
+regression against any one of them fails the build with a message naming the
+criterion.*
 
 The project is ready when:
 

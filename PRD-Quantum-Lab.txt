@@ -34,10 +34,11 @@ companion source of truth for how each one is built.
 | 🟡 PARTIAL | Some deliverables landed; the remainder is named in the section |
 | ⬜ NOT STARTED | No implementation yet |
 
-Current state: every lesson below is built, and the Explore laboratory is
-complete for one and two qubits (Phases 1–5). What remains is Phase 6: the
-FastAPI backend, the Streamlit app, end-to-end tests, documentation, figures,
-CI and the release package.
+Current state: complete. All six phases of the Technical Implementation
+Specification are delivered — the mathematical core, both Explore modes, the
+whole guided lesson, the FastAPI backend, the Streamlit app, the documentation
+set, generated figures and CI. §21's fourteen completion criteria are checked
+by the test-suite rather than asserted.
 
 ---
 
@@ -622,7 +623,7 @@ Every lesson follows the same pattern:
 
 ---
 
-# Technical architecture — 🟡 PARTIAL — shared Python core and React/TypeScript frontend complete; FastAPI backend pending
+# Technical architecture — ✅ COMPLETE
 
 Reuse the QuasiShor architecture where practical:
 
@@ -633,7 +634,7 @@ Reuse the QuasiShor architecture where practical:
 
 ---
 
-# Success criteria — 🟡 PARTIAL — every listed ability is now taught and testable; a learner-facing review belongs with the Phase 6 release
+# Success criteria — ✅ COMPLETE — every listed ability is taught by a section with a visual, an experiment, revealable mathematics and a checkpoint. Whether real learners come away with them is a question only classroom use can answer.
 
 A learner who completes the guided lesson should be able to:
 
