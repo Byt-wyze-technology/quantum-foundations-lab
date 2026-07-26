@@ -1,5 +1,12 @@
 # Quantum Foundations Lab
 
+[![CI](https://github.com/Byt-wyze-technology/quantum-foundations/actions/workflows/ci.yml/badge.svg)](https://github.com/Byt-wyze-technology/quantum-foundations/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![React](https://img.shields.io/badge/React-TypeScript-20232A?logo=react&logoColor=61DAFB)](apps/web/frontend)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Pydantic%20v2-009688?logo=fastapi&logoColor=white)](apps/web/backend)
+[![Playwright](https://img.shields.io/badge/Playwright-end--to--end-2EAD33?logo=playwright&logoColor=white)](apps/web/frontend/e2e)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 > A visual path from qubits to entanglement.
 
 An interactive teaching tool for the mathematical language of quantum
