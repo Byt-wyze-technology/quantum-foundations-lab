@@ -21,7 +21,12 @@ Issues = "https://github.com/Byt-wyze-technology/quantum-foundations-lab/issues"
 Documentation = "https://github.com/Byt-wyze-technology/quantum-foundations-lab/tree/main/docs"
 
 [project.optional-dependencies]
-dev = ["pytest", "hypothesis", "httpx", "mypy", "ruff"]
+# Starlette's TestClient needs an HTTP client. Recent versions want `httpx2`
+# and emit a deprecation warning when only `httpx` is present; older versions
+# import `httpx` directly. Both are listed because this project pins neither
+# FastAPI nor Starlette, so a fresh resolve and an existing environment can
+# legitimately want different ones.
+dev = ["pytest", "hypothesis", "httpx", "httpx2", "mypy", "ruff"]
 web = ["fastapi>=0.110", "uvicorn[standard]>=0.29", "pydantic>=2.6"]
 streamlit = ["streamlit", "matplotlib"]
 
