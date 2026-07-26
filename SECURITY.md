@@ -12,8 +12,9 @@ That keeps the attack surface small, but not empty. Reports are welcome.
 
 ## Reporting a vulnerability
 
-Please report privately rather than opening a public issue — use GitHub's
-private vulnerability reporting, or contact a maintainer directly.
+Please report privately rather than opening a public issue. Use
+[GitHub's private vulnerability reporting](https://github.com/Byt-wyze-technology/quantum-foundations-lab/security/advisories/new),
+or contact a maintainer directly.
 
 Please include what you found, how to reproduce it, and what an attacker could
 achieve. You can expect an acknowledgement within a few days and an assessment

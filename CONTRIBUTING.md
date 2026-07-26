@@ -10,6 +10,9 @@ even without a fix attached.
 Requires Node 20+ and Python 3.11+.
 
 ```bash
+git clone https://github.com/Byt-wyze-technology/quantum-foundations-lab.git
+cd quantum-foundations-lab
+
 python -m pip install -e ".[dev,web,streamlit]"
 cd apps/web/frontend && npm install
 ```

@@ -79,6 +79,13 @@ The application must not imply that:
 *The layout below is in place in full, including the Streamlit app, both
 scripts, the generated figures and the documentation set.*
 
+*The repository is published at
+`github.com/Byt-wyze-technology/quantum-foundations-lab`, so the root
+directory below is named `quantum-foundations-lab/` rather than
+`quantum-foundations/`. The Python distribution and import package keep the
+name `quantum_foundations`, which is why `pyproject.toml` still reads
+`name = "quantum-foundations"`.*
+
 Recommended monorepo layout:
 
 ```text

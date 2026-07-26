@@ -1,6 +1,6 @@
 # Quantum Foundations Lab
 
-[![CI](https://github.com/Byt-wyze-technology/quantum-foundations/actions/workflows/ci.yml/badge.svg)](https://github.com/Byt-wyze-technology/quantum-foundations/actions/workflows/ci.yml)
+[![CI](https://github.com/Byt-wyze-technology/quantum-foundations-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/Byt-wyze-technology/quantum-foundations-lab/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![React](https://img.shields.io/badge/React-TypeScript-20232A?logo=react&logoColor=61DAFB)](apps/web/frontend)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Pydantic%20v2-009688?logo=fastapi&logoColor=white)](apps/web/backend)
@@ -45,6 +45,9 @@ carries information. These are enforced by tests, not by good intentions — see
 Requires **Node 20+** and **Python 3.11+**.
 
 ```bash
+git clone https://github.com/Byt-wyze-technology/quantum-foundations-lab.git
+cd quantum-foundations-lab
+
 # The mathematical core and its tests
 python -m pip install -e ".[dev]"
 python -m pytest
@@ -200,7 +203,12 @@ physical object, or draws spin as a spinning ball.
 See [CONTRIBUTING.md](CONTRIBUTING.md) and the
 [Code of Conduct](CODE_OF_CONDUCT.md). The most useful thing you can bring is a
 place where the explanation is *wrong* or misleading — those are the bugs that
-matter most here.
+matter most here, and there is
+[an issue template](https://github.com/Byt-wyze-technology/quantum-foundations-lab/issues/new?template=explanation_problem.md)
+for exactly that.
+
+Security reports go through [SECURITY.md](SECURITY.md) rather than the issue
+tracker.
 
 ## Licence
 
