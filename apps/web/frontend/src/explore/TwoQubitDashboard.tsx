@@ -14,6 +14,7 @@
 import { useState } from "react";
 
 import {
+  type GateName,
   MAX_CIRCUIT_DEPTH,
   basisLabels,
   probabilities,
@@ -24,7 +25,7 @@ import {
   useLabStore,
 } from "../store/labStore";
 import { AmplitudeBars } from "../viz/AmplitudeBars";
-import { CircuitHistory } from "../viz/CircuitHistory";
+import { CircuitBuilder } from "../viz/CircuitBuilder";
 import { CorrelationTable } from "../viz/CorrelationTable";
 import { DensityMatrixHeatmap } from "../viz/DensityMatrixHeatmap";
 import { EntanglementIndicator } from "../viz/EntanglementIndicator";
@@ -39,6 +40,7 @@ export function TwoQubitDashboard() {
   const store = useLabStore();
   const { currentState, circuit, histogram, totalShots, lastMeasurement } = store;
   const [target, setTarget] = useState<0 | 1>(0);
+  const [selectedGate, setSelectedGate] = useState<GateName | null>(null);
 
   const labels = basisLabels(2);
   const amplitudes = currentState.amplitudes;
@@ -86,7 +88,18 @@ export function TwoQubitDashboard() {
           </div>
           <div className="gate-palette" style={{ marginTop: 14 }}>
             {SINGLE_QUBIT_GATES.map((gate) => (
-              <button key={gate} type="button" onClick={() => store.applyGate(gate, [target])}>
+              <button
+                key={gate}
+                type="button"
+                draggable
+                onDragStart={(event) => {
+                  event.dataTransfer.setData("text/plain", gate);
+                  setSelectedGate(gate);
+                }}
+                onClick={() => store.applyGate(gate, [target])}
+                onDoubleClick={() => setSelectedGate(selectedGate === gate ? null : gate)}
+                className={selectedGate === gate ? "active" : ""}
+              >
                 {gate}
               </button>
             ))}
@@ -123,14 +136,25 @@ export function TwoQubitDashboard() {
             </button>
           </div>
           <p className="caption">
-            Single-qubit gates can never create entanglement — only the two-qubit gates can. Try H
-            on q0 followed by CNOT 0→1. Depth {circuit.length}/{MAX_CIRCUIT_DEPTH}.
+            Click a gate to apply it, or drag it onto a wire in the Circuit panel. Single-qubit
+            gates can never create entanglement — only the two-qubit gates can. Try H on q0
+            followed by CNOT 0→1. Depth {circuit.length}/{MAX_CIRCUIT_DEPTH}.
           </p>
         </section>
 
         <section className="panel">
           <h2>Circuit</h2>
-          <CircuitHistory circuit={circuit} />
+          <CircuitBuilder
+            circuit={circuit}
+            qubitCount={currentState.qubitCount}
+            onPlace={(gate, targets) => store.applyGate(gate, targets)}
+            onRemove={(id) => store.removeGate(id)}
+            onStepChange={(steps) =>
+              store.setPlaybackStep(steps === circuit.length ? null : steps)
+            }
+            step={store.playbackStep ?? circuit.length}
+            selected={selectedGate}
+          />
         </section>
       </div>
 

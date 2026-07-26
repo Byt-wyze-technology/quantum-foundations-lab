@@ -10,6 +10,8 @@
 
 import { create } from "zustand";
 
+import { track } from "../analytics";
+
 import {
   type BlochVector,
   type Complex,
@@ -197,10 +199,14 @@ export type LabState = {
   measurementLog: MeasurementRecord[];
   seed: number | null;
   error: string | null;
+  /** How many gates of the circuit are applied. null means all of them. */
+  playbackStep: number | null;
 
   setInitialState: (amplitudes: StateVector) => void;
   applyGate: (gate: GateName, targets: number[], parameters?: Record<string, number>) => void;
   undoGate: () => void;
+  removeGate: (id: string) => void;
+  setPlaybackStep: (step: number | null) => void;
   resetCircuit: () => void;
   setMeasurementAxis: (axis: MeasurementAxis) => void;
   runSingleMeasurement: () => void;
@@ -231,6 +237,7 @@ export const useLabStore = create<LabState>((set, get) => ({
   measurementLog: [],
   seed: null,
   error: null,
+  playbackStep: null,
 
   setInitialState: (amplitudes) => {
     const qubitCount = Math.log2(amplitudes.length) as QubitCount;
@@ -243,6 +250,7 @@ export const useLabStore = create<LabState>((set, get) => ({
       totalShots: 0,
       lastMeasurement: null,
       error: null,
+      playbackStep: null,
     });
   },
 
@@ -257,6 +265,7 @@ export const useLabStore = create<LabState>((set, get) => ({
       return;
     }
     const operation: GateOperation = { id: nextOperationId(), gate, targets, parameters };
+    track("gate_applied", { gate, qubitCount: initialState.qubitCount });
     try {
       const nextCircuit = [...circuit, operation];
       set({
@@ -265,6 +274,7 @@ export const useLabStore = create<LabState>((set, get) => ({
         histogram: {},
         totalShots: 0,
         error: null,
+        playbackStep: null,
       });
     } catch (cause) {
       set({ error: cause instanceof Error ? cause.message : String(cause) });
@@ -281,6 +291,37 @@ export const useLabStore = create<LabState>((set, get) => ({
       histogram: {},
       totalShots: 0,
       error: null,
+      playbackStep: null,
+    });
+  },
+
+  removeGate: (id) => {
+    const { circuit, initialState } = get();
+    const nextCircuit = circuit.filter((operation) => operation.id !== id);
+    if (nextCircuit.length === circuit.length) return;
+    set({
+      circuit: nextCircuit,
+      currentState: replayCircuit(initialState, nextCircuit),
+      histogram: {},
+      totalShots: 0,
+      error: null,
+      playbackStep: null,
+    });
+  },
+
+  /**
+   * Scrub to a point in the circuit. The displayed state is replayed up to
+   * that step, so every panel shows the same moment (§10, step playback).
+   */
+  setPlaybackStep: (step) => {
+    const { circuit, initialState } = get();
+    const clamped =
+      step === null ? null : Math.max(0, Math.min(circuit.length, Math.round(step)));
+    set({
+      playbackStep: clamped,
+      currentState: replayCircuit(initialState, circuit, clamped ?? circuit.length),
+      histogram: {},
+      totalShots: 0,
     });
   },
 
@@ -293,10 +334,14 @@ export const useLabStore = create<LabState>((set, get) => ({
       totalShots: 0,
       lastMeasurement: null,
       error: null,
+      playbackStep: null,
     });
   },
 
-  setMeasurementAxis: (axis) => set({ measurementAxis: axis, histogram: {}, totalShots: 0 }),
+  setMeasurementAxis: (axis) => {
+    track("measurement_basis_changed", { basis: basisNameFor(axis) });
+    set({ measurementAxis: axis, histogram: {}, totalShots: 0 });
+  },
 
   runSingleMeasurement: () => {
     const { currentState, measurementAxis, seed, measurementLog } = get();
@@ -365,6 +410,7 @@ export const useLabStore = create<LabState>((set, get) => ({
   loadPreset: (preset) => {
     const build = PRESET_BUILDERS[preset];
     if (!build) return;
+    track("preset_selected", { preset });
     get().setInitialState(build());
   },
 

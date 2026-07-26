@@ -10,6 +10,7 @@
 
 import { Link } from "react-router-dom";
 
+import { track } from "../analytics";
 import { useLabStore } from "../store/labStore";
 import { Katex } from "../viz/Katex";
 import { Checkpoint } from "./Checkpoint";
@@ -22,6 +23,7 @@ export function LessonSectionView({ section }: { section: LessonSection }) {
   const openInExplore = () => {
     if (section.exploreState) setInitialState(section.exploreState());
     setSelectedLesson(section.id);
+    track("explore_opened", { sectionId: section.id, concept: section.concept });
   };
 
   const toneClass = section.tone === "warm" ? " warm" : section.tone === "dark" ? " dark" : "";

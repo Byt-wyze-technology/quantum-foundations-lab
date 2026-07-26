@@ -1714,6 +1714,116 @@ select {
   }
 }
 
+/* --- Circuit builder (§10) ----------------------------------------------- */
+
+.builder-wires {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.builder-wire {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border: 1px dashed transparent;
+}
+
+.builder-wire.drag-over {
+  border-color: var(--mint-deep);
+  background: #75d5b31f;
+}
+
+.wire-label {
+  font: 500 13px DM Mono;
+  color: var(--muted);
+}
+
+.wire-line {
+  height: 1px;
+  background: var(--ink);
+}
+
+.wire-drop {
+  font: 11px DM Mono;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 8px 12px;
+  min-height: 44px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.wire-drop:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.wire-drop:not(:disabled) {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.builder-sequence {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.builder-sequence li {
+  display: flex;
+  align-items: stretch;
+}
+
+.builder-sequence .empty {
+  font: 11px DM Mono;
+  color: var(--muted-soft);
+}
+
+.circuit-chip.pending {
+  opacity: 0.42;
+}
+
+.chip-remove {
+  border: 1px solid var(--line);
+  border-left: 0;
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1;
+  padding: 0 9px;
+  min-width: 30px;
+}
+
+.chip-remove:hover {
+  background: #ef7c6420;
+  color: var(--coral-deep);
+}
+
+.playback {
+  margin-top: 18px;
+}
+
+.playback .caption {
+  margin-top: 6px;
+}
+
+.dark .wire-line {
+  background: #6d817d;
+}
+
+.dark .wire-drop,
+.dark .chip-remove {
+  background: #122626;
+  border-color: #3a4d4b;
+  color: #93a5a2;
+}
+
 /* --- Glossary ------------------------------------------------------------ */
 
 .glossary {

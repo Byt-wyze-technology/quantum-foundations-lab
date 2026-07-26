@@ -8,6 +8,7 @@
 
 import { useState } from "react";
 
+import { track } from "../analytics";
 import type { Checkpoint as CheckpointData } from "./types";
 
 export function Checkpoint({
@@ -18,7 +19,17 @@ export function Checkpoint({
   sectionId: string;
 }) {
   const [chosen, setChosen] = useState<number | null>(null);
+  const [attempts, setAttempts] = useState(0);
   const selected = chosen === null ? null : checkpoint.options[chosen]!;
+
+  const choose = (index: number) => {
+    const option = checkpoint.options[index]!;
+    const attempt = attempts + 1;
+    setAttempts(attempt);
+    setChosen(index);
+    track("checkpoint_attempted", { sectionId, attempt, correct: option.correct });
+    if (option.correct) track("checkpoint_passed", { sectionId, attempt });
+  };
 
   return (
     <div className="quiz-card">
@@ -31,7 +42,7 @@ export function Checkpoint({
           key={option.label}
           type="button"
           id={`${sectionId}-option-${index}`}
-          onClick={() => setChosen(index)}
+          onClick={() => choose(index)}
           className={chosen === index ? (option.correct ? "correct" : "wrong") : ""}
           aria-pressed={chosen === index}
         >

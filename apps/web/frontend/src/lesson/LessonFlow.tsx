@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { track } from "../analytics";
 import { ketPlus, qubitFromAngles } from "../math";
 import { usePreferences } from "../ui/preferences";
 import { BlochSphere } from "../viz/BlochSphere";
@@ -52,6 +53,25 @@ function HeroSphere() {
 }
 
 export function LessonFlow() {
+  // One event when the lesson opens, and one when the learner reaches the
+  // Bell section — the two §18 singles out as milestones.
+  useEffect(() => {
+    track("lesson_started");
+    const bell = document.getElementById("bell");
+    if (!bell || typeof IntersectionObserver === "undefined") return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          track("bell_lesson_completed", { sectionId: "bell" });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(bell);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <main>
       <section className="hero">

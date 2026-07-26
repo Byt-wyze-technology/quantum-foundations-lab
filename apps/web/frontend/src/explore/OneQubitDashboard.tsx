@@ -8,6 +8,7 @@
 import { useMemo, useState } from "react";
 
 import {
+  type GateName,
   H,
   I,
   MAX_CIRCUIT_DEPTH,
@@ -31,7 +32,7 @@ import {
 import { AmplitudeBars } from "../viz/AmplitudeBars";
 import { AmplitudePhasor } from "../viz/AmplitudePhasor";
 import { BlochSphere } from "../viz/BlochSphere";
-import { CircuitHistory } from "../viz/CircuitHistory";
+import { CircuitBuilder } from "../viz/CircuitBuilder";
 import { MatrixDisplay } from "../viz/MatrixDisplay";
 import { MeasurementHistogram } from "../viz/MeasurementHistogram";
 import { StateEquation } from "../viz/StateEquation";
@@ -57,6 +58,9 @@ export function OneQubitDashboard() {
   const store = useLabStore();
   const { currentState, circuit, measurementAxis, histogram, totalShots, lastMeasurement } = store;
   const [rotationAngle, setRotationAngle] = useState(90);
+  // The palette is also the drag source for the circuit builder, so a
+  // selected gate can be placed by keyboard as well as dropped.
+  const [selectedGate, setSelectedGate] = useState<GateName | null>(null);
 
   const labels = basisLabels(1);
   const bloch = selectBlochVector(store);
@@ -121,7 +125,16 @@ export function OneQubitDashboard() {
                 key={gate.name}
                 type="button"
                 title={gate.hint}
+                draggable
+                onDragStart={(event) => {
+                  event.dataTransfer.setData("text/plain", gate.name);
+                  setSelectedGate(gate.name);
+                }}
                 onClick={() => store.applyGate(gate.name, [0])}
+                onDoubleClick={() =>
+                  setSelectedGate(selectedGate === gate.name ? null : gate.name)
+                }
+                className={selectedGate === gate.name ? "active" : ""}
               >
                 {gate.name}
               </button>
@@ -154,14 +167,25 @@ export function OneQubitDashboard() {
             ))}
           </div>
           <p className="caption">
-            Every gate here is unitary, so every one can be undone exactly. Depth {circuit.length}/
+            Click a gate to apply it, or drag it onto a wire in the Circuit panel. Every gate here
+            is unitary, so every one can be undone exactly. Depth {circuit.length}/
             {MAX_CIRCUIT_DEPTH}.
           </p>
         </section>
 
         <section className="panel">
           <h2>Circuit</h2>
-          <CircuitHistory circuit={circuit} />
+          <CircuitBuilder
+            circuit={circuit}
+            qubitCount={currentState.qubitCount}
+            onPlace={(gate, targets) => store.applyGate(gate, targets)}
+            onRemove={(id) => store.removeGate(id)}
+            onStepChange={(steps) =>
+              store.setPlaybackStep(steps === circuit.length ? null : steps)
+            }
+            step={store.playbackStep ?? circuit.length}
+            selected={selectedGate}
+          />
         </section>
       </div>
 
