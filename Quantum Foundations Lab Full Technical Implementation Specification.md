@@ -31,7 +31,7 @@ work first.
 | 3 — Guided one-qubit lesson | ✅ COMPLETE | Met and enforced by test — all seven sections carry a visual, an experiment, revealable mathematics and a checkpoint. 103 frontend tests, 256 Python tests |
 | 4 — Two-qubit system | ✅ COMPLETE | Met — side-by-side product/Bell comparison, reduced states drawn at true arrow length, concurrence indicator and correlation table. 125 frontend tests, 265 Python tests |
 | 5 — EPR and Bell correlations | ✅ COMPLETE | Met — E(θ) = −cosθ reproduced exactly, |S| reaches 2√2, and both marginals are pinned at 50% for every pair of settings, which is no-signalling made checkable. 146 frontend tests, 309 Python tests |
-| 6 — Open-source release | ⬜ NOT STARTED | Docs, CI, figures and release package |
+| 6 — Open-source release | 🟡 IN PROGRESS | Done: backend (§11–§13), frontend/backend agreement check (§21), circuit builder (§10), analytics (§18), security limits (§19). Remaining: end-to-end tests, Streamlit app, documentation, figures, CI, release package |
 
 ---
 
@@ -1405,7 +1405,7 @@ Partially entangled state
 
 ---
 
-# 10. Visual components — 🟡 PARTIAL
+# 10. Visual components — ✅ COMPLETE
 
 *Implemented: `BlochSphere`, `AmplitudePhasor`, `AmplitudeBars`,
 `StateEquation`, `MeasurementHistogram` and `DensityMatrixHeatmap`, plus
@@ -1418,9 +1418,11 @@ a mixed state, absent for half a Bell pair — which is how §21's rule against
 depicting entangled qubits as independent pure states is kept visually rather
 than by refusing to draw anything.*
 
-*Outstanding: `CircuitBuilder` currently ships as the linear `CircuitHistory`
-with click-to-apply gates and undo. Drag-and-drop placement and step playback
-remain, and are scheduled for Phase 6.*
+*`CircuitBuilder` supports drag-and-drop placement, step playback, per-gate
+removal and undo. The dashboard's gate palette is the single drag source, so
+there is one place to pick a gate rather than two. Drag-and-drop is an
+enhancement only: a selected gate can be placed from the wire buttons and each
+placed gate has its own remove control, so the panel needs no pointer (§16).*
 
 ## `BlochSphere`
 
@@ -1508,7 +1510,18 @@ Advanced panel:
 
 ---
 
-# 11. API design — ⬜ NOT STARTED
+# 11. API design — ✅ COMPLETE
+
+*All five endpoints are implemented in `apps/web/backend`, plus `/api/health`.
+The API tests drive the worked payloads below verbatim, so this document and
+the implementation check each other.*
+
+*One deviation, made deliberately: client-supplied amplitudes are judged at
+1e-6 rather than §14's 1e-10. The example requests below send 0.70710678,
+which is a norm of 0.999999998 and would fail the internal tolerance. Residue
+inside 1e-6 is rescaled — the allowance §14 grants for numerical residue — and
+anything beyond it is still rejected, so the looser bound cannot conceal a
+materially invalid state. The exact norm is always returned.*
 
 The app can run locally in the browser, but a backend provides reproducibility, validation and export.
 
@@ -1607,7 +1620,11 @@ Request:
 
 ---
 
-# 12. Data serialization — ⬜ NOT STARTED
+# 12. Data serialization — ✅ COMPLETE
+
+*Complex numbers cross the wire only as `{re, im}`, and every response
+declares its `basis_order`, so a client never has to assume the convention of
+§5.4. Both are asserted by tests.*
 
 Complex numbers:
 
@@ -1642,6 +1659,11 @@ Quantum state:
 ---
 
 # 13. Validation rules — ✅ COMPLETE
+
+*Enforced in the core and surfaced by the API in the envelope below. One
+exception type crosses the boundary and one handler renders it, so every
+rejection reaches a client in the same shape — including schema failures,
+which are given the code `INVALID_REQUEST`.*
 
 Reject:
 
@@ -1923,7 +1945,14 @@ Do not initially support arbitrary (n)-qubit state vectors. The educational valu
 
 ---
 
-# 18. Analytics — ⬜ NOT STARTED
+# 18. Analytics — ✅ COMPLETE
+
+*Implemented in `apps/web/frontend/src/analytics.ts`. The nine events below are
+the only ones that exist as a type; properties are filtered against an
+allow-list so free-form learner input cannot pass through, and timing is
+elapsed-since-load rather than wall-clock. No analytics vendor is wired up and
+no request is made — a deployment supplies a sink and takes on the disclosure
+obligations that come with it.*
 
 Track only educational interaction events:
 
@@ -1949,12 +1978,13 @@ Useful learning metrics:
 
 ---
 
-# 19. Security and privacy — 🟡 PARTIAL
+# 19. Security and privacy — ✅ COMPLETE
 
 *No account, no personal data, and share links encode only the prepared
 state's angles, the gate sequence and the measurement axis. Deterministic
-seeds are supported for classroom demonstrations. Server-side validation,
-request-size limits and CORS configuration arrive with the backend in Phase 6.*
+seeds are supported for classroom demonstrations. The backend validates every
+matrix and dimension, caps shots and circuit depth, limits request size,
+configures CORS strictly, and executes no dynamic code.*
 
 * no account required for initial release;
 * no personally identifiable information required;
