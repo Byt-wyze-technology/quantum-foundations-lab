@@ -64,6 +64,41 @@ export const GLOSSARY: GlossaryEntry[] = [
     definition:
       "One repetition of preparing a state and measuring it once. A histogram of many shots approaches the predicted probabilities; it is not one qubit measured repeatedly.",
   },
+  {
+    term: "Tensor product",
+    definition:
+      "The operation that combines two systems into one. Two qubits with two amplitudes each become a joint state with four — every amplitude of the first multiplied by every amplitude of the second.",
+  },
+  {
+    term: "Product state",
+    definition:
+      "A joint state that factorises into one state per qubit. Each qubit then has a complete description of its own, and knowing one tells you nothing about the other.",
+  },
+  {
+    term: "Entanglement",
+    definition:
+      "A joint state that does not factorise. The pair has a description no pair of separate descriptions can reproduce. It does not mean the qubits influence one another, and it cannot be used to send anything.",
+  },
+  {
+    term: "Reduced state",
+    definition:
+      "What is left of the joint description when you ignore the other qubit, obtained by a partial trace. For an entangled pair it is a mixed state, and has no single Bloch arrow.",
+  },
+  {
+    term: "Purity",
+    definition:
+      "Tr(ρ²). One for a state fully described on its own, and one half for a qubit that is half of a Bell pair — the lowest a single qubit can go.",
+  },
+  {
+    term: "Concurrence",
+    definition:
+      "A measure of entanglement running from 0 for a product state to 1 for a Bell pair. For a pure two-qubit state it equals 2|α₀₀α₁₁ − α₀₁α₁₀|.",
+  },
+  {
+    term: "Bell state",
+    definition:
+      "One of four maximally entangled two-qubit states. Their measurement outcomes are perfectly correlated, and each qubit on its own is maximally mixed.",
+  },
 ];
 
 export function Glossary({ open, close }: { open: boolean; close: () => void }) {

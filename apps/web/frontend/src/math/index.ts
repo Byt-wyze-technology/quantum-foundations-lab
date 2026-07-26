@@ -15,3 +15,4 @@ export * from "./tensor";
 export * from "./gates";
 export * from "./measurement";
 export * from "./observables";
+export * from "./entanglement";

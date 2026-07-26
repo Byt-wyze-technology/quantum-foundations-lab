@@ -29,7 +29,7 @@ work first.
 | 1 — Mathematical core | ✅ COMPLETE | All mathematical invariants pass — 229 tests, ruff and mypy clean |
 | 2 — One-qubit Explore lab | ✅ COMPLETE | Met — presets, drag and keyboard construct any pure state; gates and rotations turn it; any measurement axis and shot count measure it. 75 frontend tests |
 | 3 — Guided one-qubit lesson | ✅ COMPLETE | Met and enforced by test — all seven sections carry a visual, an experiment, revealable mathematics and a checkpoint. 103 frontend tests, 256 Python tests |
-| 4 — Two-qubit system | ⬜ NOT STARTED | Students can distinguish product and entangled states |
+| 4 — Two-qubit system | ✅ COMPLETE | Met — side-by-side product/Bell comparison, reduced states drawn at true arrow length, concurrence indicator and correlation table. 125 frontend tests, 265 Python tests |
 | 5 — EPR and Bell correlations | ⬜ NOT STARTED | Ideal correlations shown without implying communication |
 | 6 — Open-source release | ⬜ NOT STARTED | Docs, CI, figures and release package |
 
@@ -760,13 +760,12 @@ This provides a rigorous visual explanation of why neither entangled subsystem h
 
 ---
 
-# 6. Frontend state model — 🟡 PARTIAL
+# 6. Frontend state model — ✅ COMPLETE
 
-*Implemented in `apps/web/frontend/src/store/labStore.ts` with every field and
-action listed below. `currentState` is derived by replaying the circuit from
-`initialState`, so the displayed state can never disagree with the displayed
-circuit. `selectReducedBlochVectors`, `selectStatePurity` and
-`selectEntanglementMeasure` require two-qubit mode and arrive in Phase 4.*
+*Implemented in `apps/web/frontend/src/store/labStore.ts` with every field,
+action and selector listed below. `currentState` is derived by replaying the
+circuit from `initialState`, so the displayed state can never disagree with the
+displayed circuit.*
 
 Recommended Zustand store:
 
@@ -893,11 +892,11 @@ Each section should support:
 
 # 8. Detailed lesson modules — 🟡 PARTIAL
 
-*§8.1–§8.5, §8.7 and §8.8 are implemented (Phase 3). §8.6 (tensor products),
-§8.9 (entanglement) and §8.10 (Bell-state builder) arrive in Phase 4;
-§8.11 (EPR and CHSH) in Phase 5.*
+*§8.1–§8.10 are implemented: the one-qubit path in Phase 3, and tensor
+products, entanglement and the Bell-state builder in Phase 4. Only §8.11
+(EPR and CHSH) remains, in Phase 5.*
 
-## 8.1 Classical bit versus qubit
+## 8.1 Classical bit versus qubit — ✅ COMPLETE
 
 ### Visual
 
@@ -939,7 +938,7 @@ Use:
 
 ---
 
-## 8.2 Polarisation and spin
+## 8.2 Polarisation and spin — ✅ COMPLETE
 
 ### Polarisation visual
 
@@ -976,7 +975,7 @@ Label:
 
 ---
 
-## 8.3 Amplitudes and phase
+## 8.3 Amplitudes and phase — ✅ COMPLETE
 
 ### Visual components
 
@@ -1021,7 +1020,7 @@ have identical computational-basis probabilities but differ under (X)-basis meas
 
 ---
 
-## 8.4 Pauli matrices
+## 8.4 Pauli matrices — ✅ COMPLETE
 
 Each Pauli operator gets:
 
@@ -1062,7 +1061,7 @@ The visual must show that (Z) changes relative phase even when computational pro
 
 ---
 
-## 8.5 Unitary matrices
+## 8.5 Unitary matrices — ✅ COMPLETE
 
 ### Visual
 
@@ -1093,7 +1092,7 @@ Do not apply it as a valid quantum gate.
 
 ---
 
-## 8.6 Tensor products
+## 8.6 Tensor products — ✅ COMPLETE
 
 ### Visual progression
 
@@ -1137,7 +1136,7 @@ Students drag two one-qubit states and watch the four joint amplitudes update.
 
 ---
 
-## 8.7 Measurement
+## 8.7 Measurement — ✅ COMPLETE
 
 ### Required views
 
@@ -1169,7 +1168,7 @@ Each batch must represent fresh preparations of the same initial state.
 
 ---
 
-## 8.8 Hermitian observables
+## 8.8 Hermitian observables — ✅ COMPLETE
 
 ### Visual metaphor
 
@@ -1208,7 +1207,7 @@ Possible outcomes:
 
 ---
 
-## 8.9 Entanglement
+## 8.9 Entanglement — ✅ COMPLETE
 
 ### Product-state comparison
 
@@ -1250,7 +1249,7 @@ This is more rigorous than saying the particles are merely “linked”.
 
 ---
 
-## 8.10 Bell-state builder
+## 8.10 Bell-state builder — ✅ COMPLETE
 
 Circuit:
 
@@ -1284,7 +1283,7 @@ At each step update:
 
 ---
 
-## 8.11 EPR and Bell correlations
+## 8.11 EPR and Bell correlations — ⬜ NOT STARTED
 
 The first release should teach EPR correlations without claiming to provide a full loophole-free Bell-test simulation.
 
@@ -1346,11 +1345,12 @@ The simulation must label this as an ideal theoretical model.
 
 ---
 
-# 9. Explore laboratory — 🟡 PARTIAL
+# 9. Explore laboratory — ✅ COMPLETE
 
-*One-qubit mode complete: all six panels, the gate palette, rotation gates,
-measurement basis and arbitrary axis, shot batches, undo, reset, seed and
-share-state link. Two-qubit mode and its presets arrive in Phase 4.*
+*Both modes are built. One-qubit mode has all six panels, the gate palette,
+rotation gates, measurement basis and arbitrary axis, and shot batches.
+Two-qubit mode has all seven panels, the two-qubit gate palette and every
+preset listed below. Undo, reset, seed and share-state links are shared.*
 
 ## Main controls
 
@@ -1407,10 +1407,20 @@ Partially entangled state
 
 # 10. Visual components — 🟡 PARTIAL
 
-*`BlochSphere`, `AmplitudePhasor`, `AmplitudeBars`, `StateEquation` and
-`MeasurementHistogram` are implemented. `CircuitBuilder` currently ships as a
-linear `CircuitHistory`; its drag-and-drop form belongs with two-qubit mode in
-Phase 4, and `DensityMatrixHeatmap` with the reduced states there too.*
+*Implemented: `BlochSphere`, `AmplitudePhasor`, `AmplitudeBars`,
+`StateEquation`, `MeasurementHistogram` and `DensityMatrixHeatmap`, plus
+`ReducedStatePanel`, `CorrelationTable` and `EntanglementIndicator` (added
+because §8.9 and §9 require those panels by name).*
+
+*`BlochSphere` gained a `mixedVector` prop taking Bloch coordinates from a
+reduced density matrix. The arrow is then drawn at its true length — short for
+a mixed state, absent for half a Bell pair — which is how §21's rule against
+depicting entangled qubits as independent pure states is kept visually rather
+than by refusing to draw anything.*
+
+*Outstanding: `CircuitBuilder` currently ships as the linear `CircuitHistory`
+with click-to-apply gates and undo. Drag-and-drop placement and step playback
+remain, and are scheduled for Phase 6.*
 
 ## `BlochSphere`
 
@@ -1822,10 +1832,12 @@ Properties:
 
 ---
 
-## Frontend tests — 🟡 PARTIAL
+## Frontend tests — ✅ COMPLETE
 
-*The one-qubit cases below all pass, along with the two copy guards. The
-two-qubit and Bell-state cases arrive with Phase 4.*
+*Every case below passes, including the two-qubit and Bell-state cases and
+the check that entangled states are never shown as independent pure Bloch
+vectors — asserted on the accessible description, which is the text a screen
+reader announces.*
 
 Verify:
 
@@ -2012,7 +2024,7 @@ Exit criterion:
 
 All sections include visual, experiment, mathematics and checkpoint.
 
-## Phase 4 — Two-qubit system — ⬜ NOT STARTED
+## Phase 4 — Two-qubit system — ✅ COMPLETE
 
 Deliver:
 

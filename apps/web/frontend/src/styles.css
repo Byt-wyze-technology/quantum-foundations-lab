@@ -30,6 +30,13 @@
   --muted-soft: #798482;
   --panel: #f8f5ee;
   --control: #e6e2d8;
+
+  /* The Bloch sphere is drawn on a canvas, which cannot inherit CSS. It reads
+     these four values at draw time so it matches whatever surface it sits on. */
+  --bloch-fill: rgba(255, 255, 255, 0.55);
+  --bloch-halo: #f3f0e8;
+  --bloch-grid: #b9c4bf;
+  --bloch-muted: #798482;
 }
 
 * {
@@ -302,6 +309,11 @@ main {
 .dark {
   background: var(--ink);
   color: white;
+
+  --bloch-fill: rgba(255, 255, 255, 0.05);
+  --bloch-halo: #102224;
+  --bloch-grid: #48605c;
+  --bloch-muted: #8ea39e;
 }
 
 .dark p {
@@ -309,8 +321,37 @@ main {
 }
 
 .dark h2,
-.dark h3 {
+.dark h3,
+.dark h4 {
   color: white;
+}
+
+/* Figures and readouts default to ink, which disappears on a dark band. */
+.dark .amplitude-figures,
+.dark .phasor figcaption,
+.dark .density-head,
+.dark .entanglement-ends,
+.dark .phase-legend,
+.dark .histogram-legend,
+.dark .histogram-caption {
+  color: #93a5a2;
+}
+
+.dark .amplitude-figures b,
+.dark .amplitude-label,
+.dark .histogram-caption b,
+.dark .outcome-eigenvalue,
+.dark .density-cell {
+  color: #eaf0ed;
+}
+
+.dark .notice.violet-notice {
+  background: #8a7cc82e;
+  border-left-color: var(--violet);
+}
+
+.dark .notice.mint-notice {
+  background: #75d5b32a;
 }
 
 /* --- Controls ------------------------------------------------------------ */
@@ -421,6 +462,11 @@ select {
 .notice.mint-notice {
   border-left-color: var(--mint-deep);
   background: #75d5b322;
+}
+
+.notice.violet-notice {
+  border-left-color: var(--violet-deep);
+  background: #8a7cc81f;
 }
 
 .caption {
@@ -1260,6 +1306,303 @@ select {
 
   .quiz-card {
     padding: 26px 20px 30px;
+  }
+}
+
+/* --- Two-qubit panels (§8.6, §8.9, §8.10, §9) ---------------------------- */
+
+.panel-subhead {
+  font: 10px DM Mono;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted-soft);
+  margin: 24px 0 10px;
+}
+
+.reduced-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.reduced-half {
+  margin: 0;
+  text-align: center;
+  min-width: 0;
+}
+
+.reduced-half figcaption {
+  margin-bottom: 6px;
+}
+
+.reduced-half .reading {
+  margin: 8px 0 4px;
+}
+
+.correlation-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 12px DM Mono;
+}
+
+.correlation-table th,
+.correlation-table td {
+  border: 1px solid var(--line);
+  padding: 9px 8px;
+  text-align: center;
+}
+
+.correlation-table th {
+  color: var(--muted);
+  font-weight: 500;
+  background: var(--control);
+}
+
+.correlation-table .margin-header,
+.correlation-table .margin-cell {
+  background: #eeeae0;
+  color: var(--muted);
+}
+
+.entanglement-indicator {
+  margin-top: 18px;
+}
+
+.entanglement-scale {
+  position: relative;
+  display: block;
+  height: 14px;
+  border: 1px solid var(--line);
+  background: #e4e0d5;
+}
+
+.entanglement-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(to right, var(--mint), var(--violet));
+  transition: width 0.2s ease;
+}
+
+.entanglement-marker {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: var(--ink);
+  transition: left 0.2s ease;
+}
+
+.entanglement-ends {
+  display: flex;
+  justify-content: space-between;
+  font: 10px DM Mono;
+  color: var(--muted-soft);
+  margin-top: 6px;
+}
+
+.density-heatmap {
+  overflow-x: auto;
+}
+
+.density-grid {
+  display: inline-grid;
+  gap: 3px;
+  font: 11px DM Mono;
+}
+
+.density-head {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  padding: 4px 8px;
+}
+
+.density-cell {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.density-cell.diagonal {
+  border-color: var(--ink);
+  font-weight: 700;
+}
+
+/* --- §8.6 tensor builder ------------------------------------------------- */
+
+.tensor-lab {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.85fr) minmax(280px, 1fr) minmax(250px, 0.95fr);
+  gap: 30px;
+  align-items: start;
+}
+
+.tensor-factors {
+  display: grid;
+  gap: 26px;
+}
+
+.factor-controls h3 {
+  margin-bottom: 10px;
+}
+
+.tensor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(60px, 1fr));
+  gap: 4px;
+}
+
+.tensor-corner {
+  display: grid;
+  place-items: center;
+  font: 500 20px Newsreader, serif;
+  color: var(--muted-soft);
+}
+
+.tensor-head {
+  display: grid;
+  place-items: center;
+  padding: 8px 4px;
+  background: var(--control);
+  border: 1px solid var(--line);
+}
+
+.tensor-head b {
+  font: 500 14px DM Mono;
+}
+
+.tensor-head small,
+.tensor-cell small {
+  font: 10px DM Mono;
+  color: var(--muted);
+}
+
+.tensor-cell {
+  display: grid;
+  place-items: center;
+  padding: 12px 4px;
+  border: 1px solid var(--line);
+  min-height: 62px;
+}
+
+.tensor-cell b {
+  font: 500 14px DM Mono;
+}
+
+.tensor-cell small {
+  color: #33403e;
+}
+
+/* --- §8.9 comparison ----------------------------------------------------- */
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.comparison-column {
+  background: var(--panel);
+  padding: 26px;
+  min-width: 0;
+}
+
+.dark .comparison-column,
+.dark .challenge-panel {
+  background: #17302f;
+  color: #eaf0ed;
+}
+
+.dark .correlation-table th {
+  background: #122626;
+  color: #93a5a2;
+}
+
+.dark .correlation-table th,
+.dark .correlation-table td {
+  border-color: #3a4d4b;
+}
+
+.dark .correlation-table .margin-cell,
+.dark .correlation-table .margin-header {
+  background: #122626;
+  color: #93a5a2;
+}
+
+.dark .amplitude-track,
+.dark .entanglement-scale {
+  background: #0e1f1f;
+  border-color: #3a4d4b;
+}
+
+.dark .tensor-head,
+.dark .density-cell,
+.dark .tensor-cell {
+  border-color: #3a4d4b;
+}
+
+.challenge-panel {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 30px;
+}
+
+.challenge-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 20px 0;
+}
+
+.challenge-result {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.9fr) minmax(280px, 1.3fr);
+  gap: 30px;
+  align-items: start;
+}
+
+/* --- §8.10 Bell builder -------------------------------------------------- */
+
+.bell-builder {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) minmax(300px, 1.15fr);
+  gap: 36px;
+  align-items: start;
+}
+
+.bell-circuit {
+  width: 100%;
+  max-width: 420px;
+  display: block;
+}
+
+.gate-glyph {
+  font: 500 18px "DM Mono", monospace;
+  fill: #102224;
+}
+
+.bell-panels {
+  display: grid;
+  gap: 4px;
+}
+
+@media (max-width: 1100px) {
+  .tensor-lab,
+  .bell-builder,
+  .challenge-result {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 850px) {
+  .comparison-grid,
+  .challenge-controls,
+  .reduced-panel {
+    grid-template-columns: 1fr;
   }
 }
 

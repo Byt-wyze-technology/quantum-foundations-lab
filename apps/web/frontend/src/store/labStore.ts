@@ -18,26 +18,39 @@ import {
   type RandomSource,
   type StateVector,
   AXIS_Z,
+  BELL_STATES,
   MAX_CIRCUIT_DEPTH,
   MAX_SHOTS,
   applyGate,
   axisDistribution,
+  basisLabels,
+  bellPhiPlus,
   blochVector,
+  blochVectorOfDensityMatrix,
+  computationalBasisState,
+  concurrenceTwoQubit,
   expectationAlongAxis,
   gateMatrix,
   gateQubitCount,
   ket0,
+  ket1,
   ketMinus,
   ketMinusI,
   ketPlus,
   ketPlusI,
-  ket1,
   measureAlongAxis,
+  measureComputational,
   mulberry32,
+  partiallyEntangled,
   probabilities,
+  purity,
   randomPureQubit,
+  reducedDensityMatrix,
+  reducedPurity,
   sampleAlongAxis,
+  sampleComputational,
   systemRandom,
+  tensorProduct,
   varianceAlongAxis,
 } from "../math";
 
@@ -70,9 +83,15 @@ export type PresetName =
   | "ketMinus"
   | "ketPlusI"
   | "ketMinusI"
-  | "random";
+  | "random"
+  | "bellPhiPlus"
+  | "bellPhiMinus"
+  | "bellPsiPlus"
+  | "bellPsiMinus"
+  | "product"
+  | "partiallyEntangled";
 
-const ONE_QUBIT_PRESETS: Record<PresetName, () => StateVector> = {
+const PRESET_BUILDERS: Record<PresetName, () => StateVector> = {
   ket0,
   ket1,
   ketPlus,
@@ -80,9 +99,18 @@ const ONE_QUBIT_PRESETS: Record<PresetName, () => StateVector> = {
   ketPlusI,
   ketMinusI,
   random: () => randomPureQubit(),
+  bellPhiPlus: BELL_STATES.phi_plus,
+  bellPhiMinus: BELL_STATES.phi_minus,
+  bellPsiPlus: BELL_STATES.psi_plus,
+  bellPsiMinus: BELL_STATES.psi_minus,
+  product: () => tensorProduct(ketPlus(), ket0()),
+  partiallyEntangled: () => partiallyEntangled(0.9),
 };
 
-export const PRESET_LABELS: { name: PresetName; label: string; description: string }[] = [
+export type PresetEntry = { name: PresetName; label: string; description: string };
+
+/** The one-qubit presets of §9. */
+export const PRESET_LABELS: PresetEntry[] = [
   { name: "ket0", label: "|0⟩", description: "North pole — always reads 0 in the Z basis" },
   { name: "ket1", label: "|1⟩", description: "South pole — always reads 1 in the Z basis" },
   { name: "ketPlus", label: "|+⟩", description: "+x — even odds in Z, certain in X" },
@@ -92,7 +120,39 @@ export const PRESET_LABELS: { name: PresetName; label: string; description: stri
   { name: "random", label: "Random", description: "A uniformly random pure state" },
 ];
 
-const stateOf = (amplitudes: Complex[]): StateVector => amplitudes;
+/** The two-qubit presets of §9. */
+export const TWO_QUBIT_PRESETS: PresetEntry[] = [
+  {
+    name: "product",
+    label: "Product",
+    description: "|+⟩ ⊗ |0⟩ — two independent qubits, each with its own pure state",
+  },
+  {
+    name: "bellPhiPlus",
+    label: "Bell Φ⁺",
+    description: "(|00⟩ + |11⟩)/√2 — maximally entangled",
+  },
+  {
+    name: "bellPhiMinus",
+    label: "Bell Φ⁻",
+    description: "(|00⟩ − |11⟩)/√2 — same probabilities as Φ⁺, opposite phase",
+  },
+  {
+    name: "bellPsiPlus",
+    label: "Bell Ψ⁺",
+    description: "(|01⟩ + |10⟩)/√2 — anti-correlated in Z",
+  },
+  {
+    name: "bellPsiMinus",
+    label: "Bell Ψ⁻",
+    description: "(|01⟩ − |10⟩)/√2 — the singlet, used for EPR correlations",
+  },
+  {
+    name: "partiallyEntangled",
+    label: "Partly entangled",
+    description: "Between the two extremes: neither a product state nor a Bell pair",
+  },
+];
 
 const toQuantumState = (amplitudes: StateVector, qubitCount: QubitCount): QuantumState => ({
   qubitCount,
@@ -111,7 +171,7 @@ export const replayCircuit = (
   circuit: GateOperation[],
   upTo = circuit.length,
 ): QuantumState => {
-  let amplitudes = stateOf(initial.amplitudes);
+  let amplitudes = initial.amplitudes;
   for (const operation of circuit.slice(0, upTo)) {
     amplitudes = applyGate(
       amplitudes,
@@ -240,24 +300,37 @@ export const useLabStore = create<LabState>((set, get) => ({
 
   runSingleMeasurement: () => {
     const { currentState, measurementAxis, seed, measurementLog } = get();
-    if (currentState.qubitCount !== 1) return;
-    const random: RandomSource = seed === null ? systemRandom() : mulberry32(seed + measurementLog.length);
-    const outcome = measureAlongAxis(currentState.amplitudes, measurementAxis, random);
-    const record: MeasurementRecord = {
-      basis: basisNameFor(measurementAxis),
-      outcome: outcome.label,
-      probability: outcome.probability,
-      timestamp: Date.now(),
-    };
-    set({
-      lastMeasurement: record,
-      measurementLog: [record, ...measurementLog].slice(0, 12),
-    });
+    const random: RandomSource =
+      seed === null ? systemRandom() : mulberry32(seed + measurementLog.length);
+
+    // One qubit can be measured along any axis; two qubits are measured in the
+    // computational basis, which is the joint measurement §9 shows.
+    const record: MeasurementRecord =
+      currentState.qubitCount === 1
+        ? (() => {
+            const outcome = measureAlongAxis(currentState.amplitudes, measurementAxis, random);
+            return {
+              basis: basisNameFor(measurementAxis),
+              outcome: outcome.label,
+              probability: outcome.probability,
+              timestamp: Date.now(),
+            };
+          })()
+        : (() => {
+            const outcome = measureComputational(currentState.amplitudes, random);
+            return {
+              basis: "Z" as const,
+              outcome: outcome.label,
+              probability: outcome.probability,
+              timestamp: Date.now(),
+            };
+          })();
+
+    set({ lastMeasurement: record, measurementLog: [record, ...measurementLog].slice(0, 12) });
   },
 
   runShots: (shots) => {
     const { currentState, measurementAxis, histogram, totalShots, seed } = get();
-    if (currentState.qubitCount !== 1) return;
     if (shots < 1) {
       set({ error: "The number of shots must be at least 1." });
       return;
@@ -267,7 +340,10 @@ export const useLabStore = create<LabState>((set, get) => ({
       return;
     }
     const random: RandomSource = seed === null ? systemRandom() : mulberry32(seed + totalShots);
-    const batch = sampleAlongAxis(currentState.amplitudes, measurementAxis, shots, random);
+    const batch =
+      currentState.qubitCount === 1
+        ? sampleAlongAxis(currentState.amplitudes, measurementAxis, shots, random)
+        : sampleComputational(currentState.amplitudes, shots, random);
     const merged: Record<string, number> = { ...histogram };
     for (const [label, count] of Object.entries(batch)) {
       merged[label] = (merged[label] ?? 0) + count;
@@ -278,15 +354,16 @@ export const useLabStore = create<LabState>((set, get) => ({
   resetHistogram: () => set({ histogram: {}, totalShots: 0, lastMeasurement: null }),
 
   setQubitCount: (qubitCount) => {
-    // Two-qubit mode arrives with Phase 4; the guard keeps the control honest
-    // until then rather than silently producing an invalid state.
-    if (qubitCount === 1) {
-      get().setInitialState(ket0());
-    }
+    const { currentState } = get();
+    if (currentState.qubitCount === qubitCount) return;
+    get().setInitialState(qubitCount === 1 ? ket0() : computationalBasisState("00"));
+    // A measurement axis only means something for one qubit; reset it so the
+    // control never shows a setting the two-qubit panels are ignoring.
+    if (qubitCount === 2) set({ measurementAxis: AXIS_Z });
   },
 
   loadPreset: (preset) => {
-    const build = ONE_QUBIT_PRESETS[preset];
+    const build = PRESET_BUILDERS[preset];
     if (!build) return;
     get().setInitialState(build());
   },
@@ -313,8 +390,50 @@ export const axisBasisName = basisNameFor;
 export const selectProbabilities = (state: LabState): number[] =>
   probabilities(state.currentState.amplitudes);
 
+export const selectBasisLabels = (state: LabState): string[] =>
+  basisLabels(state.currentState.qubitCount);
+
+/** A Bloch arrow, only for a genuinely pure one-qubit state (§21). */
 export const selectBlochVector = (state: LabState): BlochVector | null =>
   state.currentState.qubitCount === 1 ? blochVector(state.currentState.amplitudes) : null;
+
+/**
+ * Bloch vectors of each qubit's reduced state.
+ *
+ * These are *not* independent pure states. For an entangled pair each vector
+ * is short — zero for a Bell pair — and the components that draw them show
+ * that shortening rather than normalising it away.
+ */
+export const selectReducedBlochVectors = (
+  state: LabState,
+): { a: BlochVector; b: BlochVector } | null => {
+  if (state.currentState.qubitCount !== 2) return null;
+  const { amplitudes } = state.currentState;
+  return {
+    a: blochVectorOfDensityMatrix(reducedDensityMatrix(amplitudes, [0], 2)),
+    b: blochVectorOfDensityMatrix(reducedDensityMatrix(amplitudes, [1], 2)),
+  };
+};
+
+/** Purity of each subsystem: 1 when separable, ½ for half a Bell pair. */
+export const selectStatePurity = (state: LabState): { a: number; b: number } | null => {
+  if (state.currentState.qubitCount !== 2) return null;
+  const { amplitudes } = state.currentState;
+  return {
+    a: purity(reducedDensityMatrix(amplitudes, [0], 2)),
+    b: purity(reducedDensityMatrix(amplitudes, [1], 2)),
+  };
+};
+
+/** Concurrence: 0 for a product state, 1 for a maximally entangled pair. */
+export const selectEntanglementMeasure = (state: LabState): number | null =>
+  state.currentState.qubitCount === 2
+    ? concurrenceTwoQubit(state.currentState.amplitudes)
+    : null;
+
+/** Closed-form reduced purity, 1 − C²/2, used to cross-check the trace above. */
+export const selectReducedPurity = (state: LabState): number | null =>
+  state.currentState.qubitCount === 2 ? reducedPurity(state.currentState.amplitudes) : null;
 
 export const selectExpectationValues = (
   state: LabState,
@@ -338,3 +457,6 @@ export const selectAxisDistribution = (state: LabState) =>
   state.currentState.qubitCount === 1
     ? axisDistribution(state.currentState.amplitudes, state.measurementAxis)
     : null;
+
+/** The default two-qubit starting point, exported for tests and presets. */
+export const defaultTwoQubitState = bellPhiPlus;

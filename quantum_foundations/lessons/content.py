@@ -163,6 +163,58 @@ LESSON_SECTIONS: tuple[LessonSection, ...] = (
         glossary_terms=("Hermitian observable", "Expectation value"),
         spec_section="8.8",
     ),
+    LessonSection(
+        id="tensor",
+        index=8,
+        concept="tensor",
+        title="Four numbers where there were two.",
+        misconception=MisconceptionGuard(
+            wrong="Two qubits are just two Bloch spheres side by side.",
+            right=(
+                "Two qubits share one four-amplitude state. It sometimes factorises into "
+                "two separate descriptions, and the interesting cases are the ones where it does not."
+            ),
+        ),
+        glossary_terms=("Tensor product", "Product state"),
+        spec_section="8.6",
+    ),
+    LessonSection(
+        id="entanglement",
+        index=9,
+        concept="entanglement",
+        title="A pair with no parts.",
+        misconception=MisconceptionGuard(
+            wrong="Measuring one entangled qubit sends a signal to the other.",
+            right=(
+                "Neither qubit's own statistics change when the other is measured. What exists "
+                "is a correlation, visible only once both sets of results are brought together "
+                "by ordinary means."
+            ),
+        ),
+        glossary_terms=(
+            "Entanglement",
+            "Product state",
+            "Reduced state",
+            "Purity",
+            "Concurrence",
+        ),
+        spec_section="8.9",
+    ),
+    LessonSection(
+        id="bell",
+        index=10,
+        concept="bell",
+        title="Two gates, and the pair exists.",
+        misconception=MisconceptionGuard(
+            wrong="A qubit in superposition is already entangled.",
+            right=(
+                "Superposition describes one qubit; entanglement describes a pair. "
+                "|+⟩ ⊗ |0⟩ has a superposition in it and no entanglement at all."
+            ),
+        ),
+        glossary_terms=("Bell state", "Entanglement", "Concurrence"),
+        spec_section="8.10",
+    ),
 )
 
 

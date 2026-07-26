@@ -5,11 +5,12 @@
  * stable 60 fps, and complete control over the drawing order so the state
  * arrow reads correctly whether it points toward or away from the viewer.
  *
- * Two rules from §1 and §21 are enforced here rather than left to lesson copy:
- * the caption never describes the sphere as a physical object, and the
- * component only ever renders a *pure one-qubit* state. An entangled
- * subsystem has no arrow, and asking for one is a programming error, not
- * something to approximate.
+ * Two rules from §1 and §21 are enforced here rather than left to lesson copy.
+ * The caption never describes the sphere as a physical object. And a state is
+ * drawn at its true Bloch length: a pure one-qubit state reaches the surface,
+ * while a reduced state passed as `mixedVector` falls short of it and half a
+ * Bell pair collapses to a dot with no direction at all. The picture is never
+ * allowed to promise a definite arrow the mathematics does not support.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -27,7 +28,19 @@ import {
 export type SphericalAxis = MeasurementAxis;
 
 export type BlochSphereProps = {
-  state: StateVector;
+  /** A pure one-qubit state. Omit only when supplying `mixedVector` instead. */
+  state?: StateVector;
+  /**
+   * Bloch coordinates of a possibly *mixed* one-qubit state, taken from a
+   * reduced density matrix (§8.9).
+   *
+   * The arrow is drawn at its true length, which is less than one whenever the
+   * subsystem is mixed and zero for half a Bell pair. That is how §21's rule —
+   * never depict entangled qubits as independent pure states — is honoured:
+   * the picture shows an arrow that has visibly left the surface, rather than
+   * a confident unit arrow that would be a lie.
+   */
+  mixedVector?: BlochVector;
   interactive?: boolean;
   showAxes?: boolean;
   showPhaseArc?: boolean;
@@ -57,6 +70,25 @@ const COLORS = {
   muted: "#798482",
 };
 
+/**
+ * Canvas cannot inherit CSS, so the four surface-dependent colours are read
+ * from custom properties at draw time. That keeps the sphere legible on the
+ * paper background and on the dark lesson bands without either caller having
+ * to know which it is sitting on.
+ */
+const surfaceColors = (element: HTMLCanvasElement) => {
+  const styles = getComputedStyle(element);
+  const read = (name: string, fallback: string) =>
+    styles.getPropertyValue(name).trim() || fallback;
+  return {
+    fill: read("--bloch-fill", COLORS.paper),
+    halo: read("--bloch-halo", COLORS.paper),
+    grid: read("--bloch-grid", COLORS.grid),
+    muted: read("--bloch-muted", COLORS.muted),
+    line: read("--line", COLORS.line),
+  };
+};
+
 const project = (vector: BlochVector, camera: Camera, radius: number) => {
   const cosYaw = Math.cos(camera.yaw);
   const sinYaw = Math.sin(camera.yaw);
@@ -81,6 +113,7 @@ const project = (vector: BlochVector, camera: Camera, radius: number) => {
 
 export function BlochSphere({
   state,
+  mixedVector,
   interactive = false,
   showAxes = true,
   showPhaseArc = true,
@@ -95,8 +128,17 @@ export function BlochSphere({
   const dragMode = useRef<"orbit" | "state" | null>(null);
   const lastPointer = useRef<{ x: number; y: number } | null>(null);
 
-  const angles = anglesFromQubit(state);
-  const vector = blochVectorFromAngles(angles.theta, angles.phi);
+  if (!state && !mixedVector) {
+    throw new Error("BlochSphere needs either a pure `state` or a `mixedVector`.");
+  }
+
+  const pureAngles = state ? anglesFromQubit(state) : null;
+  const vector =
+    mixedVector ?? blochVectorFromAngles(pureAngles!.theta, pureAngles!.phi);
+  const arrowLength = Math.hypot(vector.x, vector.y, vector.z);
+  // A mixed state has no phase arc to draw: there is no single relative phase.
+  const angles = pureAngles ?? { theta: 0, phi: 0 };
+  const drawPhaseArc = showPhaseArc && pureAngles !== null;
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -110,6 +152,7 @@ export function BlochSphere({
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     context.clearRect(0, 0, size, size);
 
+    const surface = surfaceColors(canvas);
     const centre = size / 2;
     const radius = size * 0.36;
     context.save();
@@ -118,9 +161,9 @@ export function BlochSphere({
     // Sphere body.
     context.beginPath();
     context.arc(0, 0, radius, 0, Math.PI * 2);
-    context.fillStyle = "rgba(255,255,255,0.55)";
+    context.fillStyle = surface.fill;
     context.fill();
-    context.strokeStyle = COLORS.line;
+    context.strokeStyle = surface.line;
     context.lineWidth = 1;
     context.stroke();
 
@@ -165,9 +208,9 @@ export function BlochSphere({
       context.setLineDash([]);
     };
 
-    drawGreatCircle("equator", COLORS.grid, true);
-    drawGreatCircle("meridianXZ", COLORS.grid, true);
-    drawGreatCircle("meridianYZ", COLORS.grid, true);
+    drawGreatCircle("equator", surface.grid, true);
+    drawGreatCircle("meridianXZ", surface.grid, true);
+    drawGreatCircle("meridianYZ", surface.grid, true);
 
     const axisEnds: { vector: BlochVector; ket: string }[] = [
       { vector: { x: 1, y: 0, z: 0 }, ket: "|+⟩" },
@@ -186,7 +229,7 @@ export function BlochSphere({
         context.moveTo(0, 0);
         context.lineTo(projected.screenX, projected.screenY);
         context.globalAlpha = projected.depth >= 0 ? 0.75 : 0.28;
-        context.strokeStyle = COLORS.muted;
+        context.strokeStyle = surface.muted;
         context.lineWidth = 1;
         context.stroke();
         context.globalAlpha = 1;
@@ -233,7 +276,7 @@ export function BlochSphere({
     }
 
     // Phase arc: the azimuthal angle φ, drawn on the equator.
-    if (showPhaseArc && Math.sin(angles.theta) > 1e-6) {
+    if (drawPhaseArc && Math.sin(angles.theta) > 1e-6) {
       const steps = 48;
       context.beginPath();
       for (let step = 0; step <= steps; step += 1) {
@@ -264,36 +307,62 @@ export function BlochSphere({
       context.globalAlpha = 1;
     }
 
-    // The state arrow.
-    const tip = project(vector, camera, radius);
-    context.beginPath();
-    context.moveTo(0, 0);
-    context.lineTo(tip.screenX, tip.screenY);
-    context.strokeStyle = COLORS.coral;
-    context.lineWidth = 3;
-    context.lineCap = "round";
-    context.stroke();
+    // A mixed state has a shortened arrow. The shaded ball shows how much of
+    // the sphere the state has retreated from — full sphere means no arrow at
+    // all, which is exactly the case for half of a Bell pair.
+    if (arrowLength < 0.999) {
+      context.beginPath();
+      context.arc(0, 0, radius * (1 - arrowLength), 0, Math.PI * 2);
+      context.fillStyle = COLORS.violet;
+      context.globalAlpha = 0.14;
+      context.fill();
+      context.globalAlpha = 0.45;
+      context.strokeStyle = COLORS.violet;
+      context.setLineDash([3, 4]);
+      context.lineWidth = 1;
+      context.stroke();
+      context.setLineDash([]);
+      context.globalAlpha = 1;
+    }
 
-    const headAngle = Math.atan2(tip.screenY, tip.screenX);
-    const headLength = 11;
-    context.beginPath();
-    context.moveTo(tip.screenX, tip.screenY);
-    context.lineTo(
-      tip.screenX - headLength * Math.cos(headAngle - 0.4),
-      tip.screenY - headLength * Math.sin(headAngle - 0.4),
-    );
-    context.lineTo(
-      tip.screenX - headLength * Math.cos(headAngle + 0.4),
-      tip.screenY - headLength * Math.sin(headAngle + 0.4),
-    );
-    context.closePath();
-    context.fillStyle = COLORS.coral;
-    context.fill();
+    // The state arrow. A maximally mixed qubit gets a dot rather than an arrow
+    // of arbitrary heading: it genuinely has no direction to point.
+    if (arrowLength < 1e-6) {
+      context.beginPath();
+      context.arc(0, 0, 5, 0, Math.PI * 2);
+      context.fillStyle = COLORS.violet;
+      context.fill();
+    } else {
+      const tip = project(vector, camera, radius);
+      context.beginPath();
+      context.moveTo(0, 0);
+      context.lineTo(tip.screenX, tip.screenY);
+      context.strokeStyle = COLORS.coral;
+      context.lineWidth = 3;
+      context.lineCap = "round";
+      context.stroke();
 
-    context.beginPath();
-    context.arc(tip.screenX, tip.screenY, 4, 0, Math.PI * 2);
-    context.fillStyle = COLORS.ink;
-    context.fill();
+      const headAngle = Math.atan2(tip.screenY, tip.screenX);
+      const headLength = 11;
+      context.beginPath();
+      context.moveTo(tip.screenX, tip.screenY);
+      context.lineTo(
+        tip.screenX - headLength * Math.cos(headAngle - 0.4),
+        tip.screenY - headLength * Math.sin(headAngle - 0.4),
+      );
+      context.lineTo(
+        tip.screenX - headLength * Math.cos(headAngle + 0.4),
+        tip.screenY - headLength * Math.sin(headAngle + 0.4),
+      );
+      context.closePath();
+      context.fillStyle = COLORS.coral;
+      context.fill();
+
+      context.beginPath();
+      context.arc(tip.screenX, tip.screenY, 4, 0, Math.PI * 2);
+      context.fillStyle = COLORS.ink;
+      context.fill();
+    }
 
     // Axis labels last, each behind a paper-coloured halo, so they stay
     // legible wherever an axis, the measurement line or the arrow crosses them.
@@ -308,9 +377,9 @@ export function BlochSphere({
         const labelY = projected.screenY * 1.2;
         context.globalAlpha = projected.depth >= 0 ? 1 : 0.5;
         context.lineWidth = 4;
-        context.strokeStyle = COLORS.paper;
+        context.strokeStyle = surface.halo;
         context.strokeText(end.ket, labelX, labelY);
-        context.fillStyle = COLORS.muted;
+        context.fillStyle = surface.muted;
         context.fillText(end.ket, labelX, labelY);
         context.globalAlpha = 1;
       }
@@ -389,7 +458,9 @@ export function BlochSphere({
 
   /** Keyboard control, required by §16. */
   const handleKeyDown = (event: React.KeyboardEvent<HTMLCanvasElement>) => {
-    if (!interactive) return;
+    // A mixed state has no pure state to steer, so the arrow keys have nothing
+    // to move; the sphere stays orbitable but read-only.
+    if (!interactive || !pureAngles) return;
     const step = event.shiftKey ? Math.PI / 36 : Math.PI / 12;
     let { theta, phi } = angles;
     switch (event.key) {
@@ -417,9 +488,36 @@ export function BlochSphere({
   };
 
   const degrees = (radians: number) => Math.round((radians * 180) / Math.PI);
-  const description = `${label ? `${label}. ` : ""}Qubit state: theta ${degrees(
-    angles.theta,
-  )} degrees, phi ${degrees(angles.phi)} degrees. ${canonicalName(angles.theta, angles.phi)}`;
+  const prefix = label ? `${label}. ` : "";
+
+  // The screen-reader summary must say the same thing the picture says (§16).
+  // For a mixed state that means reporting the shortened arrow rather than
+  // dressing it up as a pure direction.
+  /** Spoken direction of any arrow with a direction to speak of. */
+  const spokenDirection = (): string => {
+    const theta = Math.acos(Math.min(1, Math.max(-1, vector.z / (arrowLength || 1))));
+    const phi = (Math.atan2(vector.y, vector.x) + 2 * Math.PI) % (2 * Math.PI);
+    return `theta ${degrees(theta)} degrees, phi ${degrees(phi)} degrees. ${canonicalName(
+      theta,
+      phi,
+    )}`;
+  };
+
+  const description = pureAngles
+    ? `${prefix}Qubit state: ${spokenDirection()} ` +
+      `Measurement probabilities in the Z basis: 0: ${(
+        Math.cos(pureAngles.theta / 2) ** 2 * 100
+      ).toFixed(0)} per cent, 1: ${(Math.sin(pureAngles.theta / 2) ** 2 * 100).toFixed(
+        0,
+      )} per cent.`
+    : arrowLength < 1e-6
+      ? `${prefix}This qubit is maximally mixed. It has no Bloch arrow at all: every measurement ` +
+        "direction gives an even split, and no single-qubit state describes it."
+      : arrowLength > 0.999
+        ? `${prefix}This qubit has a pure state of its own: ${spokenDirection()}`
+        : `${prefix}This qubit is in a mixed state. Its Bloch arrow reaches only ${(
+            arrowLength * 100
+          ).toFixed(0)} per cent of the way to the surface, so it is not a pure state.`;
 
   return (
     <div className="bloch-wrap">

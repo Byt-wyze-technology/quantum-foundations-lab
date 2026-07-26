@@ -25,8 +25,9 @@ const renderSection = (section: (typeof LESSON_SECTIONS)[number]) =>
   );
 
 describe("lesson structure", () => {
-  it("covers the one-qubit concepts Phase 3 delivers", () => {
+  it("covers the concepts Phases 3 and 4 deliver, in teaching order", () => {
     expect(LESSON_SECTIONS.map((section) => section.concept)).toEqual([
+      // Phase 3 — one qubit.
       "classical-bit",
       "polarisation",
       "phase",
@@ -34,6 +35,10 @@ describe("lesson structure", () => {
       "unitary",
       "measurement",
       "observable",
+      // Phase 4 — two qubits.
+      "tensor",
+      "entanglement",
+      "bell",
     ]);
   });
 

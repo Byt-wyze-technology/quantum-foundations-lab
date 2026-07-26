@@ -35,9 +35,9 @@ companion source of truth for how each one is built.
 | ⬜ NOT STARTED | No implementation yet |
 
 Current state: the mathematical core is complete and tested (Phase 1), the
-Explore laboratory is complete for one qubit (Phase 2), and the guided lesson
-covers the whole one-qubit path (Phase 3). Lessons 7, 8, 11, 12 and 13 need
-two qubits and arrive in Phases 4 and 5.
+Explore laboratory is complete for one and two qubits (Phases 2 and 4), and the
+guided lesson runs from the classical bit through to Bell states (Phases 3 and
+4). Only Lesson 13, the EPR experiment, remains — Phase 5.
 
 ---
 
@@ -348,7 +348,7 @@ Returns exactly.
 
 ---
 
-# Lesson 7 — Two qubits — ⬜ NOT STARTED
+# Lesson 7 — Two qubits — ✅ COMPLETE — §8.6
 
 Big leap.
 
@@ -388,7 +388,7 @@ Sliders.
 
 ---
 
-# Lesson 8 — Tensor products — ⬜ NOT STARTED
+# Lesson 8 — Tensor products — ✅ COMPLETE — §8.6
 
 Avoid writing ⊗ first.
 
@@ -494,7 +494,7 @@ measured values.
 
 ---
 
-# Lesson 11 — Entanglement — ⬜ NOT STARTED
+# Lesson 11 — Entanglement — ✅ COMPLETE — §8.9
 
 Most important section.
 
@@ -530,7 +530,7 @@ Only correlations.
 
 ---
 
-# Lesson 12 — Bell states — ⬜ NOT STARTED
+# Lesson 12 — Bell states — ✅ COMPLETE — §8.10
 
 Build them.
 
@@ -582,7 +582,7 @@ End with them.
 
 ---
 
-# Explore Laboratory — 🟡 PARTIAL — one-qubit mode complete; two qubits in Phase 4
+# Explore Laboratory — ✅ COMPLETE — both one- and two-qubit modes
 
 Exactly like QuasiShor.
 

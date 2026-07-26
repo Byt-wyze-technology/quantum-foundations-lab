@@ -11,9 +11,12 @@
  *   Lesson 10  → §8.8
  */
 
-import { ketPlus, qubitFromAngles } from "../math";
+import { bellPhiPlus, ket0, ketPlus, qubitFromAngles, tensorProduct } from "../math";
 import { AmplitudesAndPhase } from "./visuals/AmplitudesAndPhase";
+import { BellStateBuilder } from "./visuals/BellStateBuilder";
 import { ClassicalBitVsQubit } from "./visuals/ClassicalBitVsQubit";
+import { EntanglementComparison } from "./visuals/EntanglementComparison";
+import { TensorProductBuilder } from "./visuals/TensorProductBuilder";
 import { MeasurementLab } from "./visuals/MeasurementLab";
 import { ObservableLab } from "./visuals/ObservableLab";
 import { PauliPlayground } from "./visuals/PauliPlayground";
@@ -436,6 +439,194 @@ export const LESSON_SECTIONS: LessonSection[] = [
         "The instrument shows an eigenvalue. The expectation value is the average of many such readings, and often is not one of them.",
     },
     exploreState: () => qubitFromAngles(1.2, 0.6),
+    tone: "plain",
+  },
+
+  {
+    id: "tensor",
+    index: 8,
+    eyebrow: "TWO SYSTEMS, ONE STATE",
+    title: "Four numbers where there were two.",
+    summary:
+      "Add a second qubit and the description does not double — it squares. Two amplitudes each become four joint amplitudes, one for every pairing. That is the tensor product, and doing it once by hand makes the symbol unnecessary.",
+    concept: "tensor",
+    visual: () => <TensorProductBuilder />,
+    equations: [
+      {
+        latex: "\\left|0\\right\\rangle \\otimes \\left|1\\right\\rangle = \\left|01\\right\\rangle",
+        gloss:
+          "The left operand is the first qubit. Written as column vectors, (1,0)ᵀ ⊗ (0,1)ᵀ = (0,1,0,0)ᵀ.",
+      },
+      {
+        latex:
+          "(\\alpha_0\\left|0\\right\\rangle + \\alpha_1\\left|1\\right\\rangle) \\otimes (\\gamma_0\\left|0\\right\\rangle + \\gamma_1\\left|1\\right\\rangle) = \\alpha_0\\gamma_0\\left|00\\right\\rangle + \\alpha_0\\gamma_1\\left|01\\right\\rangle + \\alpha_1\\gamma_0\\left|10\\right\\rangle + \\alpha_1\\gamma_1\\left|11\\right\\rangle",
+        gloss:
+          "Every amplitude of the first qubit multiplies every amplitude of the second. Each joint amplitude is one product.",
+      },
+      {
+        latex: "\\dim(\\mathbb{C}^{2} \\otimes \\mathbb{C}^{2}) = 4",
+        gloss:
+          "n qubits need 2ⁿ amplitudes. That growth is the reason this release stops at two — and the reason simulating many qubits is hard.",
+      },
+    ],
+    checkpoints: [
+      {
+        question: "How many complex amplitudes describe three qubits?",
+        options: [
+          {
+            label: "Eight",
+            correct: true,
+            response: "Right — 2³. Each extra qubit doubles the number of joint amplitudes.",
+          },
+          {
+            label: "Six",
+            correct: false,
+            response:
+              "Six would be three qubits with two amplitudes each, kept separate. The joint state has one amplitude per combination of outcomes, so 2 × 2 × 2 = 8.",
+          },
+          {
+            label: "Three",
+            correct: false,
+            response:
+              "That would be one number per qubit. Even a single qubit needs two amplitudes.",
+          },
+        ],
+      },
+    ],
+    glossaryTerms: ["Tensor product", "Product state"],
+    misconception: {
+      wrong: "Two qubits are just two Bloch spheres side by side.",
+      right:
+        "Two qubits share one four-amplitude state. It sometimes factorises into two separate descriptions, and the interesting cases are the ones where it does not.",
+    },
+    exploreState: () => tensorProduct(ketPlus(), ket0()),
+    tone: "plain",
+  },
+
+  {
+    id: "entanglement",
+    index: 9,
+    eyebrow: "THE ONE THAT MATTERS",
+    title: "A pair with no parts.",
+    summary:
+      "Some joint states factorise into one description per qubit. Most do not. When a state does not factorise, each qubit on its own is not merely unknown — it has no state of its own to be described, and the Bloch arrow shrinks to nothing to say so.",
+    concept: "entanglement",
+    visual: () => <EntanglementComparison />,
+    equations: [
+      {
+        latex:
+          "\\left|\\Phi^{+}\\right\\rangle = \\tfrac{1}{\\sqrt2}(\\left|00\\right\\rangle + \\left|11\\right\\rangle)",
+        gloss:
+          "The state cannot be written as one qubit's state tensored with another's. Try it: no choice of four numbers works.",
+      },
+      {
+        latex: "\\rho_A = \\operatorname{Tr}_B\\left|\\psi\\right\\rangle\\!\\left\\langle\\psi\\right| = \\tfrac{I}{2}",
+        gloss:
+          "Trace out qubit B and what remains for A is the maximally mixed state — the same description you would give a completely unknown qubit.",
+      },
+      {
+        latex: "\\operatorname{Tr}(\\rho_A^{2}) = \\tfrac12",
+        gloss:
+          "Purity one half, the lowest a single qubit can reach. A product state gives one instead, which is why its Bloch arrow keeps full length.",
+      },
+    ],
+    checkpoints: [
+      {
+        question:
+          "Alice measures her half of a Bell pair and gets 0. Bob's qubit is now certain to give 0 too. Has anything been sent to Bob?",
+        options: [
+          {
+            label: "No — and Bob cannot tell she measured at all",
+            correct: true,
+            response:
+              "Correct. Bob's outcome statistics are identical whether or not Alice measured. The correlation only appears when the two lists of results are later compared, and comparing them needs an ordinary channel.",
+          },
+          {
+            label: "Yes — her measurement changed his qubit instantly",
+            correct: false,
+            response:
+              "Bob's reduced state is I/2 before Alice measures and I/2 after. Nothing he can do reveals whether she measured, so nothing has reached him.",
+          },
+          {
+            label: "Yes, but only one bit",
+            correct: false,
+            response:
+              "Not even one bit. Alice cannot choose her outcome, so she cannot encode anything in it; Bob sees an even split either way.",
+          },
+        ],
+      },
+    ],
+    glossaryTerms: ["Entanglement", "Product state", "Reduced state", "Purity", "Concurrence"],
+    misconception: {
+      wrong: "Measuring one entangled qubit sends a signal to the other.",
+      right:
+        "Neither qubit's own statistics change when the other is measured. What exists is a correlation, visible only once both sets of results are brought together by ordinary means.",
+    },
+    exploreState: bellPhiPlus,
+    tone: "dark",
+  },
+
+  {
+    id: "bell",
+    index: 10,
+    eyebrow: "BUILDING ONE",
+    title: "Two gates, and the pair exists.",
+    summary:
+      "Entanglement is not exotic machinery. A Hadamard and a controlled-NOT are enough. Step through the two gates and watch the moment each qubit stops having a state of its own — while the probabilities barely flinch.",
+    concept: "bell",
+    visual: () => <BellStateBuilder />,
+    equations: [
+      {
+        latex: "\\left|00\\right\\rangle \\xrightarrow{\\;H_0\\;} \\tfrac{1}{\\sqrt2}(\\left|00\\right\\rangle + \\left|10\\right\\rangle)",
+        gloss:
+          "The Hadamard puts qubit 0 into |+⟩. The pair is still a product state: |+⟩ ⊗ |0⟩.",
+      },
+      {
+        latex:
+          "\\tfrac{1}{\\sqrt2}(\\left|00\\right\\rangle + \\left|10\\right\\rangle) \\xrightarrow{\\;\\mathrm{CNOT}\\;} \\tfrac{1}{\\sqrt2}(\\left|00\\right\\rangle + \\left|11\\right\\rangle)",
+        gloss:
+          "The controlled-NOT flips qubit 1 only in the branch where qubit 0 is 1. One amplitude moves, and the state stops factorising.",
+      },
+      {
+        latex:
+          "\\left|\\Phi^{\\pm}\\right\\rangle = \\tfrac{\\left|00\\right\\rangle \\pm \\left|11\\right\\rangle}{\\sqrt2}, \\quad \\left|\\Psi^{\\pm}\\right\\rangle = \\tfrac{\\left|01\\right\\rangle \\pm \\left|10\\right\\rangle}{\\sqrt2}",
+        gloss:
+          "The four Bell states. They are mutually orthogonal and each is maximally entangled.",
+      },
+    ],
+    checkpoints: [
+      {
+        question:
+          "After the Hadamard but before the CNOT, is the pair entangled?",
+        options: [
+          {
+            label: "No — it is |+⟩ ⊗ |0⟩, a product state",
+            correct: true,
+            response:
+              "Right. Qubit 0 is in a superposition, which is not the same thing as being entangled. Both reduced states are still pure.",
+          },
+          {
+            label: "Yes — qubit 0 is in a superposition",
+            correct: false,
+            response:
+              "Superposition and entanglement are different. A single qubit in |+⟩ is in superposition and perfectly well described on its own.",
+          },
+          {
+            label: "Partly — the concurrence is one half",
+            correct: false,
+            response:
+              "The concurrence is exactly zero at that point. It jumps to one only when the CNOT is applied.",
+          },
+        ],
+      },
+    ],
+    glossaryTerms: ["Bell state", "Entanglement", "Concurrence"],
+    misconception: {
+      wrong: "A qubit in superposition is already entangled.",
+      right:
+        "Superposition describes one qubit; entanglement describes a pair. |+⟩ ⊗ |0⟩ has a superposition in it and no entanglement at all.",
+    },
+    exploreState: bellPhiPlus,
     tone: "plain",
   },
 ];
