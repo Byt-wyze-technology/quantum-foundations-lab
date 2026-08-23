@@ -3,6 +3,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [react()],
+  base: "/quantum-foundations-lab/",
   server: {
     port: 5173,
     proxy: {
