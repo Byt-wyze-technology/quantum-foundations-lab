@@ -11,7 +11,7 @@
 import { expect, test } from "@playwright/test";
 
 const openTwoQubitLab = async (page: import("@playwright/test").Page) => {
-  await page.goto("/explore");
+  await page.goto("explore");
   await page.getByLabel("Qubits").selectOption("2");
   await expect(page.getByRole("heading", { name: "Joint state", exact: true })).toBeVisible();
 };
@@ -106,7 +106,7 @@ test.describe("§15 — the Bell-state scenario", () => {
 test.describe("§15 — the phase scenario", () => {
   test("Z leaves the Z-basis odds alone and flips the X-basis outcome", async ({ page }) => {
     // 1. Load |+⟩.
-    await page.goto("/explore");
+    await page.goto("explore");
     await page.getByRole("button", { name: "|+⟩" }).click();
 
     const measurement = page.getByRole("heading", { name: "Measurement" }).locator("..");
@@ -146,7 +146,7 @@ test.describe("§15 — the phase scenario", () => {
 
 test.describe("the guided lesson", () => {
   test("opens, reveals its mathematics on request, and marks a checkpoint", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("./");
     await expect(
       page.getByRole("heading", { name: /A qubit has infinitely many directions/ }),
     ).toBeVisible();
@@ -179,7 +179,7 @@ test.describe("the guided lesson", () => {
 
 test.describe("accessibility (§16)", () => {
   test("the Bloch sphere is keyboard operable and describes its state", async ({ page }) => {
-    await page.goto("/explore");
+    await page.goto("explore");
     await page.getByRole("button", { name: "|0⟩" }).click();
 
     const sphere = page.getByRole("img", { name: /Qubit state/ }).first();
@@ -195,7 +195,7 @@ test.describe("accessibility (§16)", () => {
   });
 
   test("offers a skip link and high-contrast and reduced-motion switches", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("./");
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
 
